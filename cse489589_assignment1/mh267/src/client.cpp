@@ -209,12 +209,19 @@ void client_main(int argc, string ip, char *port)
 
                         printf("\nSENDing it to the remote server ... ");
 
+                        char hostname[1024];
+                        hostname[1023] = '\0';
+                        gethostname(hostname, 1023);
+
+                        //cout<<"HOSTNAME --- .>>>   "<<hostname<<"\n";
+
                         string cur_ip = get_ip();
                         char *first2 = add_two_string((char *)"LOGIN", (char *) cur_ip.c_str());
                         char* added_string = add_two_string(first2, port);
+                        msg = add_two_string(added_string, hostname);
 
-                        cout<<added_string<<"\n";
-                        msg = added_string;
+                        //cout<<msg<<"\n";
+                        //msg = added_string;
 
 
                         if(send(server, msg, strlen(msg), 0) == strlen(msg))
