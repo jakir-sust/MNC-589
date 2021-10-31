@@ -197,7 +197,7 @@ void client_main(int argc, string ip, char *port)
 
                     else if (command_vec[0] == "LOGIN") {
 
-                        server = connect_to_host((char *)&command_vec[1][0], port);
+                        server = connect_to_host((char *)&command_vec[1][0], (char *)&command_vec[2][0]);
                         fdaccept = server;
                         if(fdaccept < 0) perror("Accept failed.");
                         //printf("\nRemote Host connected!\n");
@@ -211,7 +211,7 @@ void client_main(int argc, string ip, char *port)
 
                         string cur_ip = get_ip();
                         char *first2 = add_two_string((char *)"LOGIN", (char *) cur_ip.c_str());
-                        char* added_string = add_two_string(first2, (char *)&command_vec[2][0]);
+                        char* added_string = add_two_string(first2, port);
 
                         cout<<added_string<<"\n";
                         msg = added_string;
