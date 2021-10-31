@@ -211,7 +211,7 @@ void client_main(int argc, string ip, char *port)
 
                         string cur_ip = get_ip();
                         char *first2 = add_two_string((char *)"LOGIN", (char *) cur_ip.c_str());
-                        char* added_string = add_two_string(first2, port);
+                        char* added_string = add_two_string(first2, (char *)&command_vec[2][0]);
 
                         cout<<added_string<<"\n";
                         msg = added_string;

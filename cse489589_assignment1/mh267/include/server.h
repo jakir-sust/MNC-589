@@ -6,13 +6,14 @@
 using namespace std;
 
 struct client_info{
-  string IP, PORT, host_name;
-
+  string IP;
+  string PORT;
+  string host_name;
   int fd;
   int socket_index;
   int num_msg_sent;
   int num_msg_rcv;
-  int login_status;
+  string login_status;
   vector<string> blocked_list;
 };
 

@@ -35,8 +35,11 @@
 #include <stdio.h>
 #include <sstream>
 #include <iterator>
+#include <algorithm>
+
 #include "../include/server.h"
 #include "../include/ip_address.h"
+#include "../include/logger.h"
 
 using namespace std;
 
@@ -55,6 +58,12 @@ using namespace std;
 */
 vector<client_info> client_list;
 
+bool compare(client_info a, client_info b)
+{
+    if (a.PORT < b.PORT) return 1;
+    else return 0;
+}
+
 vector<string> get_vector_string(string buffer)
 {
     string command = buffer;
@@ -70,14 +79,18 @@ void add_new_client(string IP, string PORT, int fd, int sock_index)
 {
     if (client_list.size() ==0)
     {
-        cout<<"Empty logged in clients\n";
+        //cout<<"Empty logged in clients\n";
     }
 
     client_info client;
     client.IP = IP;
     client.PORT = PORT;
+    client.host_name = "host_name"; //need to be updated
     client.fd = fd;
     client.socket_index = sock_index;
+    client.num_msg_sent = 0;
+    client.num_msg_rcv = 0;
+    client.login_status = "logged-in";
 
     int client_exist = 0;
     for(int i = 0; i < client_list.size(); i++) {
@@ -195,7 +208,7 @@ void server_main(int argc, char *port)
 
 						string str_cmd = string(cmd);
 						str_cmd = str_cmd.substr(0, str_cmd.size()-1);
-						cout<<str_cmd<<"  "<<str_cmd.size()<<"\n";
+						//cout<<str_cmd<<"  "<<str_cmd.size()<<"\n";
 
 						if(str_cmd == "AUTHOR") {
 						    // Need to be implemented
@@ -211,9 +224,31 @@ void server_main(int argc, char *port)
 						}
 						else if(str_cmd == "LIST") {
 						    // Need to be implemented
+						    cse4589_print_and_log("[LIST:SUCCESS]\n");
+
+						    sort(client_list.begin(), client_list.end(), compare);
+
+						    for(int i = 0 ; i < client_list.size(); i++) {
+						        client_info cur = client_list[i];
+						        //cout<<cur.IP<<"\n";
+                                cse4589_print_and_log("%-5d%-35s%-20s%-8d\n", i+1, cur.host_name.c_str(), cur.IP.c_str(), atoi(cur.PORT.c_str()));
+                            }
+
+						    cse4589_print_and_log("[LIST:END]\n");
 						}
 						else if(str_cmd == "STATISTICS") {
 						    // Need to be implemented
+						    cse4589_print_and_log("[STATISTICS:SUCCESS]\n");
+
+						    sort(client_list.begin(), client_list.end(), compare);
+
+						    for(int i = 0 ; i < client_list.size(); i++) {
+						        client_info cur = client_list[i];
+						        //cout<<cur.IP<<"\n";
+						        cse4589_print_and_log("%-5d%-35s%-8d%-8d%-8s\n", i+1, cur.host_name.c_str(), cur.num_msg_sent, cur.num_msg_rcv, cur.login_status.c_str());
+						    }
+
+						    cse4589_print_and_log("[STATISTICS:END]\n");
 						}
 						else if(str_cmd == "BLOCKED") {
 						    // Need to be implemented
@@ -266,7 +301,9 @@ void server_main(int argc, char *port)
 
                             cout<< command_vec[0]<<"\n";
                             if (command_vec[0] == "LOGIN") {
-                                 add_new_client(command_vec[1], command_vec[2], fdaccept, sock_index);
+                                 string client_ip = command_vec[1];
+                                 string client_port = command_vec[2];
+                                 add_new_client(client_ip, client_port, fdaccept, sock_index);
                             }
 
                             else if (command_vec[0] == "SEND") {
@@ -297,6 +334,9 @@ void server_main(int argc, char *port)
                                  // Need to be implemented
                              }
                              else if (command_vec[0] == "LOGOUT") {
+                                 // Need to be implemented
+                             }
+                             else if (command_vec[0] == "LIST") {
                                  // Need to be implemented
                              }
                              else if (command_vec[0] == "EXIT") {
