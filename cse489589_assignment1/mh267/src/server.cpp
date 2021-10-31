@@ -78,7 +78,16 @@ void add_new_client(string IP, string PORT, int fd, int sock_index)
     client.PORT = PORT;
     client.fd = fd;
     client.socket_index = sock_index;
-    client_list.push_back(client);
+
+    int client_exist = 0;
+    for(int i = 0; i < client_list.size(); i++) {
+        if(client_list[i].IP == IP) {
+            client_exist = 1;
+            break;
+        }
+    }
+
+    if(client_exist == 0) client_list.push_back(client);
 
     for(int i = 0; i < client_list.size(); i++)
     {
@@ -157,8 +166,8 @@ void server_main(int argc, char *port)
 	while(TRUE){
 		memcpy(&watch_list, &master_list, sizeof(master_list));
 		
-		//printf("\n[PA1-Server@CSE489/589]$ ");
-		//fflush(stdout);
+		printf("\n[PA1-Server@CSE489/589]$ ");
+		fflush(stdout);
 		
 		/* select() system call. This will BLOCK */
 		selret = select(head_socket + 1, &watch_list, NULL, NULL, NULL);
@@ -237,7 +246,7 @@ void server_main(int argc, char *port)
 
                             string buffer_str = string(buffer);
 
-                            cout<<"BUFFER string ====  "<<buffer_str<<"\n";
+                            cout<<"Client sent to me BUFFER string ====  "<<buffer_str<<"\n";
 
                             command_vec = get_vector_string(buffer);
                             //if (command_vec[0] == "LOGIN") {
@@ -255,15 +264,15 @@ void server_main(int argc, char *port)
                                 else {
                                     cout<<"Dest IP found\n";
                                     if(send(dest_client.fd, buffer, strlen(buffer), 0) == strlen(buffer))
-								        printf("Sending to destination Done!\n");
+								        printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
 
                                 }
 
                             }
 
-							printf("\nClient sent me: %s\n", buffer);
+							//printf("\nClient sent me: %s\n", buffer);
 							printf("ECHOing it back to the remote host ... ");
-							if(send(fdaccept, buffer, strlen(buffer), 0) == strlen(buffer))
+							if(send(sock_index, buffer, strlen(buffer), 0) == strlen(buffer))
 								printf("Done!\n");
 							fflush(stdout);
 						}

@@ -4,11 +4,16 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 using namespace std;
+
 struct client_info{
-  string IP;
-  string PORT;
+  string IP, PORT, host_name;
+
   int fd;
   int socket_index;
+  int num_msg_sent;
+  int num_msg_rcv;
+  int login_status;
+  vector<string> blocked_list;
 };
 
 vector<string> get_vector_string(string buffer);

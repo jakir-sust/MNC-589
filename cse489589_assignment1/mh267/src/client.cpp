@@ -177,7 +177,7 @@ void client_main(int argc, string ip, char *port)
 
                         string cur_ip = get_ip();
                         char* dest_msg = &command_vec[2][0];
-                        char *first2 = add_two_string((char *)"SEND", (char *) "128.205.36.33");
+                        char *first2 = add_two_string((char *)"SEND", (char *) &(command_vec[1][0]));
                         char* added_string = add_two_string(first2, dest_msg);
 
                         cout<<added_string<<"\n";

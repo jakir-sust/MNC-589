@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 	cse4589_init_log(argv[2]);
 
 	if(strcmp(argv[1],"s") == 0) {
-	    //server_main(2, argv[2]);
+	    server_main(2, argv[2]);
 	}
 	else {
 	    client_main(3, "127.0.0.1", argv[2]);
