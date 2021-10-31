@@ -197,13 +197,26 @@ void server_main(int argc, char *port)
 						str_cmd = str_cmd.substr(0, str_cmd.size()-1);
 						cout<<str_cmd<<"  "<<str_cmd.size()<<"\n";
 
-						if(str_cmd == "IP") {
+						if(str_cmd == "AUTHOR") {
+						    // Need to be implemented
+						}
+
+						else if(str_cmd == "IP") {
 						    string ip = get_ip();
         	                cout<<"Ip address from my server code = "<<ip<<"\n";
 						}
 						else if(str_cmd == "PORT") {
 						    string ip = get_ip();
         	                cout<<"Port number "<<port<<"\n";
+						}
+						else if(str_cmd == "LIST") {
+						    // Need to be implemented
+						}
+						else if(str_cmd == "STATISTICS") {
+						    // Need to be implemented
+						}
+						else if(str_cmd == "BLOCKED") {
+						    // Need to be implemented
 						}
 						
 						//Process PA1 commands here ...
@@ -256,7 +269,7 @@ void server_main(int argc, char *port)
                                  add_new_client(command_vec[1], command_vec[2], fdaccept, sock_index);
                             }
 
-                            if (command_vec[0] == "SEND") {
+                            else if (command_vec[0] == "SEND") {
                                 cout<<"destination IP in server =  "<<command_vec[1]<< "  "<<command_vec[2]<<"\n";
                                 client_info dest_client = get_client_info(command_vec[1]);
 
@@ -269,6 +282,26 @@ void server_main(int argc, char *port)
                                 }
 
                             }
+
+                             else if (command_vec[0] == "BROADCAST") {
+                                 // Need to be implemented
+                             }
+                             else if (command_vec[0] == "BLOCK") {
+                                 // Need to be implemented
+                             }
+
+                             else if (command_vec[0] == "UNBLOCK") {
+                                 // Need to be implemented
+                             }
+                             else if (command_vec[0] == "REFRESH") {
+                                 // Need to be implemented
+                             }
+                             else if (command_vec[0] == "LOGOUT") {
+                                 // Need to be implemented
+                             }
+                             else if (command_vec[0] == "EXIT") {
+                                 // Need to be implemented
+                             }
 
 							//printf("\nClient sent me: %s\n", buffer);
 							printf("ECHOing it back to the remote host ... ");

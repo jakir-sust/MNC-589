@@ -168,7 +168,10 @@ void client_main(int argc, string ip, char *port)
 
                     cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
 
-                    if (command_vec[0] == "IP") {
+                    if (command_vec[0] == "AUTHOR") {
+                        // Need to be implemented
+                    }
+                    else if (command_vec[0] == "IP") {
                         string ip = get_ip();
                         cout<<"Ip address from client my code = "<<ip<<"\n";
                     }
@@ -188,8 +191,11 @@ void client_main(int argc, string ip, char *port)
                         fflush(stdout);
 
                     }
+                    else if (command_vec[0] == "BROADCAST") {
+                        // Need to be implemented
+                    }
 
-                    if (command_vec[0] == "LOGIN") {
+                    else if (command_vec[0] == "LOGIN") {
 
                         server = connect_to_host((char *)&command_vec[1][0], port);
                         fdaccept = server;
@@ -225,29 +231,48 @@ void client_main(int argc, string ip, char *port)
                             fflush(stdout);
                         }
 
+                    }
+                    else if (command_vec[0] == "BROADCAST") {
+                        // Need to be implemented
+                    }
+                    else if (command_vec[0] == "REFRESH") {
+                        // Need to be implemented
+                    }
+                    else if (command_vec[0] == "BLOCK") {
+                        // Need to be implemented
+                    }
+                    else if (command_vec[0] == "UNBLOCK") {
+                        // Need to be implemented
+                    }
+                    else if (command_vec[0] == "LOGOUT") {
+                        // Need to be implemented
+                    }
+                    else if (command_vec[0] == "EXIT") {
+                        // Need to be implemented
+                    }
                 }
-            }
 
-            else {
-
-                char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
-                memset(buffer, '\0', BUFFER_SIZE);
-
-                if(recv(sock_index, buffer, BUFFER_SIZE, 0) <= 0){
-                    close(sock_index);
-                    printf("Remote Host Server terminated connection!\n");
-                    /* Remove from watched list */
-                    FD_CLR(sock_index, &master_list);
-                }
+                // Other client is sending data through server
                 else {
-                    printf("\nServer sent me: %s\n", buffer);
-                    fflush(stdout);
+
+                    char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
+                    memset(buffer, '\0', BUFFER_SIZE);
+
+                    if(recv(sock_index, buffer, BUFFER_SIZE, 0) <= 0){
+                        close(sock_index);
+                        printf("Remote Host Server terminated connection!\n");
+                        /* Remove from watched list */
+                        FD_CLR(sock_index, &master_list);
+                    }
+                    else {
+                        printf("\nServer sent me: %s\n", buffer);
+                        fflush(stdout);
+                    }
                 }
+
             }
 
-        }
-
-	}
+	    }
 	}
 }
 
