@@ -23,13 +23,14 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include "../include/client.h"
+#include "../include/server.h"
 
 #include "../include/global.h"
 #include "../include/logger.h"
-#include "logger.cpp"
-#include "client.cpp"
-#include "server.cpp"
-//#include "ip_address.cpp"
+
+
+
 
 using namespace std;
 
@@ -64,10 +65,10 @@ int main(int argc, char **argv)
 	cse4589_init_log(argv[2]);
 
 	if(strcmp(argv[1],"s") == 0) {
-	    server_main(2, argv[2]);
+	    //server_main(2, argv[2]);
 	}
 	else {
-	    client_main(3, "128.205.36.46", argv[2]);
+	    client_main(3, "127.0.0.1", argv[2]);
 	}
 
 	cout<<"OK done\n";

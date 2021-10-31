@@ -7,12 +7,13 @@
 #include <string>
 #include <cstring>
 #include <typeinfo>
+#include <ip_address.h>
 
 
 
 using namespace std;
 
-string  get_ip () {
+string  get_ip() {
     struct ifaddrs * ifAddrStruct=NULL;
     struct ifaddrs * ifa=NULL;
     void * tmpAddrPtr=NULL;

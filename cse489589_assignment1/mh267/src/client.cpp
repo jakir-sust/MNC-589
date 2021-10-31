@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <strings.h>
-#include <string.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netdb.h>
@@ -33,22 +32,14 @@
 #include <cstdio>
 #include <iostream>
 #include <stdio.h>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <iterator>
 
-#include "ip_address.cpp"
+#include <sstream>
+#include <iterator>
+#include <unistd.h>
+#include "../include/client.h"
+#include "../include/ip_address.h"
 using namespace std;
 
-#define BACKLOG 5
-#define STDIN 0
-#define TRUE 1
-#define CMD_SIZE 100
-#define BUFFER_SIZE 256
-#define MSG_SIZE 256
-
-int connect_to_host(char *server_ip, char *server_port);
 
 /**
 * main function
@@ -57,7 +48,7 @@ int connect_to_host(char *server_ip, char *server_port);
 * @param  argv The argument list
 * @return 0 EXIT_SUCCESS
 */
-vector<string> get_vector_string(char* buffer)
+vector<string> get_vector_stringc(char* buffer)
 {
     string command = string(buffer);
     std::string buf;
@@ -173,7 +164,7 @@ void client_main(int argc, string ip, char *port)
 
 
                     vector<string> command_vec;
-                    command_vec = get_vector_string(msg);
+                    command_vec = get_vector_stringc(msg);
 
                     cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
 
@@ -200,7 +191,7 @@ void client_main(int argc, string ip, char *port)
 
                     if (command_vec[0] == "LOGIN") {
 
-                        server = connect_to_host((char *)ip_addr, port);
+                        server = connect_to_host((char *)&command_vec[1][0], port);
                         fdaccept = server;
                         if(fdaccept < 0) perror("Accept failed.");
                         //printf("\nRemote Host connected!\n");

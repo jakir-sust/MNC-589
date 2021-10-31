@@ -25,8 +25,7 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <strings.h>
-#include <string.h>
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <netdb.h>
@@ -34,13 +33,11 @@
 #include <cstdio>
 #include <iostream>
 #include <stdio.h>
-#include <string>
 #include <sstream>
-#include <vector>
 #include <iterator>
-#include <string>
+#include "../include/server.h"
+#include "../include/ip_address.h"
 
-#include "ip_address.cpp"
 using namespace std;
 
 #define BACKLOG 5
@@ -56,11 +53,6 @@ using namespace std;
 * @param  argv The argument list
 * @return 0 EXIT_SUCCESS
 */
-struct client_info{
-  string IP, PORT;
-  int fd;
-  int socket_index;
-};
 vector<client_info> client_list;
 
 vector<string> get_vector_string(string buffer)
