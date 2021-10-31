@@ -75,7 +75,7 @@ vector<string> get_vector_string(string buffer)
 
     return command_vec;
 }
-void add_new_client(string IP, string PORT, int fd, int sock_index)
+void add_new_client(string IP, string PORT, string client_host_name, int fd, int sock_index)
 {
     if (client_list.size() ==0)
     {
@@ -85,7 +85,7 @@ void add_new_client(string IP, string PORT, int fd, int sock_index)
     client_info client;
     client.IP = IP;
     client.PORT = PORT;
-    client.host_name = "host_name"; //need to be updated
+    client.host_name = client_host_name; //need to be updated
     client.fd = fd;
     client.socket_index = sock_index;
     client.num_msg_sent = 0;
@@ -303,7 +303,14 @@ void server_main(int argc, char *port)
                             if (command_vec[0] == "LOGIN") {
                                  string client_ip = command_vec[1];
                                  string client_port = command_vec[2];
-                                 add_new_client(client_ip, client_port, fdaccept, sock_index);
+                                 string client_host_name = command_vec[3];
+                                 add_new_client(client_ip, client_port, client_host_name, fdaccept, sock_index);
+
+                                 //printf("ECHOing it back to the remote host ... ");
+                                // struct
+                                 //if(send(sock_index, &client_list, strlen(client_list), 0) == strlen(client_list))
+                                 //    printf("Done!\n");
+                                 //fflush(stdout);
                             }
 
                             else if (command_vec[0] == "SEND") {
@@ -343,11 +350,12 @@ void server_main(int argc, char *port)
                                  // Need to be implemented
                              }
 
+                             if(send(sock_index, buffer, strlen(buffer), 0) == strlen(buffer))
+                                     printf("Done!\n");
+                             fflush(stdout);
+
 							//printf("\nClient sent me: %s\n", buffer);
-							printf("ECHOing it back to the remote host ... ");
-							if(send(sock_index, buffer, strlen(buffer), 0) == strlen(buffer))
-								printf("Done!\n");
-							fflush(stdout);
+
 						}
 						
 						free(buffer);
