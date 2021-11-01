@@ -415,7 +415,14 @@ void server_main(int argc, char *port)
 
                                 if(dest_client.IP == "None") cout<<"Destination IP not in the list\n";
                                 else {
-                                    cout<<"Dest IP found\n";
+									cout<<"Dest IP found\n";
+									//Logic for updating STATS for Sending Client
+									for(int i = 0 ; i < client_list.size(); i++) {
+										if(client_list[i].IP == sender_client){
+											client_list[i].num_msg_sent += 1;
+										}
+									}
+									
                                     if(dest_client.login_status == "logged-out") {
                                         cout<<"Client logged out\n";
                                         for(int i = 0 ; i < client_list.size(); i++) {
@@ -438,7 +445,14 @@ void server_main(int argc, char *port)
                                             cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_client.c_str(), receiver_client.c_str(), sender_msg.c_str());
                                             cse4589_print_and_log("[%s:END]\n", "RELAYED");
                                         }
-                                    }
+										//Logic for updating STATS for Receiving Client
+										for(int i = 0 ; i < client_list.size(); i++) {
+											if(client_list[i].IP == receiver_client){
+												client_list[i].num_msg_rcv += 1;
+											}
+										}
+									}
+                                    
 
                                 }
 
