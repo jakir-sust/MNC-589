@@ -393,6 +393,7 @@ void server_main(int argc, char *port)
                                         cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", cur_buf_msg.sender_ip.c_str(),
                                                                 client_ip.c_str(), cur_buf_msg.sender_msg.c_str());
                                         cse4589_print_and_log("[%s:END]\n", "RELAYED");
+										client_list[i].num_msg_rcv += 1;
 
                                     }
                                     char * client_list_data = (char*) send_buffer_msg_to_client.c_str();
