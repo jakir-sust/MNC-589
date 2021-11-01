@@ -311,6 +311,22 @@ void server_main(int argc, char *port)
                                  //if(send(sock_index, &client_list, strlen(client_list), 0) == strlen(client_list))
                                  //    printf("Done!\n");
                                  //fflush(stdout);
+								 char client_data[2048];
+
+								for(int i = 0 ; i < client_list.size(); i++) {
+									cout<<"Inside For";
+						        	if(client_list[i].login_status =="logged-in"){
+										cout<<"Inside If";
+										strcat(client_data, client_list[i].host_name.c_str());
+										strcat(client_data," ");
+										strcat(client_data, client_list[i].IP.c_str());
+										strcat(client_data," ");
+										strcat(client_data, client_list[i].PORT.c_str());
+										strcat(client_data,"\n");
+									}
+								}
+
+								cout<<client_data;
                             }
 
                             else if (command_vec[0] == "SEND") {
