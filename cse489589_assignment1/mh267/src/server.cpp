@@ -211,22 +211,33 @@ void server_main(int argc, char *port)
 						printf("\nServer  got the message : %s\n", cmd);
 
 						string str_cmd = string(cmd);
-						str_cmd = str_cmd.substr(0, str_cmd.size()-1);
+						//str_cmd = str_cmd.substr(0, str_cmd.size()-1);
+
+						vector<string> command_vec;
+                        command_vec = get_vector_string(str_cmd);
 						//cout<<str_cmd<<"  "<<str_cmd.size()<<"\n";
 
-						if(str_cmd == "AUTHOR") {
+						if(command_vec[0] == "AUTHOR") {
 						    // Need to be implemented
+                            cse4589_print_and_log("[AUTHOR:SUCCESS]\n");
+                            cse4589_print_and_log("I, mh267, have read and understood the course academic integrity policy.\n");
+                            cse4589_print_and_log("[AUTHOR:END]\n");
 						}
 
-						else if(str_cmd == "IP") {
+						else if(command_vec[0]  == "IP") {
 						    string ip = get_ip();
-        	                cout<<"Ip address from my server code = "<<ip<<"\n";
+        	                //cout<<"Ip address from my server code = "<<ip<<"\n";
+        	                cse4589_print_and_log("[IP:SUCCESS]\n");
+                            cse4589_print_and_log("IP:%s\n", ip.c_str());
+                            cse4589_print_and_log("[IP:END]\n");
 						}
-						else if(str_cmd == "PORT") {
-						    string ip = get_ip();
-        	                cout<<"Port number from my server code = "<<port<<"\n";
+						else if(command_vec[0]  == "PORT") {
+        	                //cout<<"Port number from my server code = "<<port<<"\n";
+                            cse4589_print_and_log("[PORT:SUCCESS]\n");
+                            cse4589_print_and_log("PORT:%s\n", port);
+                            cse4589_print_and_log("[PORT:END]\n");
 						}
-						else if(str_cmd == "LIST") {
+						else if(command_vec[0]  == "LIST") {
 						    // Need to be implemented
 						    cse4589_print_and_log("[LIST:SUCCESS]\n");
 
@@ -240,7 +251,7 @@ void server_main(int argc, char *port)
 
 						    cse4589_print_and_log("[LIST:END]\n");
 						}
-						else if(str_cmd == "STATISTICS") {
+						else if(command_vec[0]  == "STATISTICS") {
 						    // Need to be implemented
 						    cse4589_print_and_log("[STATISTICS:SUCCESS]\n");
 
@@ -254,9 +265,24 @@ void server_main(int argc, char *port)
 
 						    cse4589_print_and_log("[STATISTICS:END]\n");
 						}
-						else if(str_cmd == "BLOCKED") {
+						else if(command_vec[0]  == "BLOCKED") {
 						    // Need to be implemented
-						}
+						    string blocker_ip = command_vec[1];
+						    for(int i = 0 ; i < client_list.size(); i++) {
+                                client_info cur = client_list[i];
+                                if (blocker_ip != cur.IP) continue;
+
+                                for (int j =0 ; j<cur.blocked_list.size(); j++) {
+                                    struct block_info block_dest;
+                                    block_dest = cur.blocked_list[j];
+                                    cse4589_print_and_log("[BLOCKED:SUCCESS]\n");
+                                    cse4589_print_and_log("%-5d%-35s%-20s%-8d\n",j+1, block_dest.blocked_host_name.c_str(),
+                                                            block_dest.blocked_ip.c_str(), atoi(block_dest.blocked_port.c_str()));
+                                    cse4589_print_and_log("[BLOCKED:END]\n");
+                                }
+
+						    }
+                        }
 						
 						//Process PA1 commands here ...
 						
@@ -362,6 +388,11 @@ void server_main(int argc, char *port)
                                         send_buffer_msg_to_client += cur_buf_msg.sender_ip + " ";
                                         send_buffer_msg_to_client += cur_buf_msg.sender_msg + " ";
 
+                                        cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                        cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", cur_buf_msg.sender_ip.c_str(),
+                                                                client_ip.c_str(), cur_buf_msg.sender_msg.c_str());
+                                        cse4589_print_and_log("[%s:END]\n", "RELAYED");
+
                                     }
                                     char * client_list_data = (char*) send_buffer_msg_to_client.c_str();
 
@@ -400,8 +431,12 @@ void server_main(int argc, char *port)
                                     else {
                                         string msg_client = "EVENT " + sender_client + " " + sender_msg;
                                         char * msg_to_client = (char*) msg_client.c_str();
-                                        if(send(dest_client.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client))
-                                            printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
+                                        if(send(dest_client.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
+                                            //printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
+                                            cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                            cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_client.c_str(), receiver_client.c_str(), sender_msg.c_str());
+                                            cse4589_print_and_log("[%s:END]\n", "RELAYED");
+                                        }
                                     }
 
                                 }
@@ -413,6 +448,22 @@ void server_main(int argc, char *port)
                              }
                              else if (command_vec[0] == "BLOCK") {
                                  // Need to be implemented
+                                 string sender_ip = command_vec[1];
+
+                                 string blocked_ip = command_vec[2];
+                                 string blocked_host_name = command_vec[3];
+                                 string blocked_port = command_vec[4];
+
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+                                     client_info cur = client_list[i];
+                                     if (sender_ip != cur.IP) continue;
+
+                                     struct block_info block_dest;
+                                     block_dest.blocked_ip = blocked_ip;
+                                     block_dest.blocked_host_name = blocked_host_name;
+                                     block_dest.blocked_port = blocked_port;
+                                     client_list[i].blocked_list.push_back(block_dest);
+                                 }
                              }
 
                              else if (command_vec[0] == "UNBLOCK") {

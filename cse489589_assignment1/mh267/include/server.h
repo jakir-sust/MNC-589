@@ -10,6 +10,13 @@ struct buffer_info{
     string sender_ip;
     string sender_msg;
 };
+
+struct block_info{
+    string blocked_ip;
+    string blocked_host_name;
+    string blocked_port;
+};
+
 struct client_info{
   string IP;
   string PORT;
@@ -19,8 +26,8 @@ struct client_info{
   int num_msg_sent;
   int num_msg_rcv;
   string login_status;
-  vector<string> blocked_list;
 
+  vector<block_info> blocked_list;
   queue<buffer_info> buffer_msg;
 };
 
