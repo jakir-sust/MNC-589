@@ -82,30 +82,34 @@ void add_new_client(string IP, string PORT, string client_host_name, int fd, int
         //cout<<"Empty logged in clients\n";
     }
 
-    client_info client;
-    client.IP = IP;
-    client.PORT = PORT;
-    client.host_name = client_host_name; //need to be updated
-    client.fd = fd;
-    client.socket_index = sock_index;
-    client.num_msg_sent = 0;
-    client.num_msg_rcv = 0;
-    client.login_status = "logged-in";
-
     int client_exist = 0;
     for(int i = 0; i < client_list.size(); i++) {
         if(client_list[i].IP == IP) {
             client_exist = 1;
+            client_list[i].login_status = "logged-in";
             break;
         }
     }
 
-    if(client_exist == 0) client_list.push_back(client);
+    if(client_exist == 0)
+    {
+        client_info client;
+        client.IP = IP;
+        client.PORT = PORT;
+        client.host_name = client_host_name; //need to be updated
+        client.fd = fd;
+        client.socket_index = sock_index;
+        client.num_msg_sent = 0;
+        client.num_msg_rcv = 0;
+        client.login_status = "logged-in";
+        client_list.push_back(client);
+    }
 
     for(int i = 0; i < client_list.size(); i++)
     {
         cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
     }
+    cout<<"--------------------------------------------------\n";
 }
 
 client_info get_client_info(string IP)
@@ -115,7 +119,7 @@ client_info get_client_info(string IP)
     client_with_IP.IP = "None";
     for(int i = 0; i < client_list.size(); i++)
     {
-        cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
+        //cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
         if(client_list[i].IP == IP) {
             client_with_IP = client_list[i];
             break;
@@ -131,7 +135,7 @@ void server_main(int argc, char *port)
 		//printf("Usage:%s [port]\n", argv[0]);
 		exit(-1);
 	}
-	std::cout<<port<<"\n";
+	std::cout<<"Port number in server ==   "<<port<<"\n";
 	
 	int server_socket, head_socket, selret, sock_index, fdaccept=0, caddr_len;
 	struct sockaddr_in client_addr;
@@ -187,10 +191,10 @@ void server_main(int argc, char *port)
 		if(selret < 0)
 			perror("select failed.");
 
-		printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+		//printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		/* Check if we have sockets/STDIN to process */
 		if(selret > 0){
-		    cout<<"OK\n";
+		    //cout<<"OK\n";
 			/* Loop through socket descriptors to check which ones are ready */
 			for(sock_index=0; sock_index<=head_socket; sock_index+=1){
 				
@@ -204,25 +208,37 @@ void server_main(int argc, char *port)
 						if(fgets(cmd, CMD_SIZE-1, stdin) == NULL) //Mind the newline character that will be written to cmd
 							exit(-1);
 						
-						printf("\nI got: %s\n", cmd);
+						printf("\nServer  got the message : %s\n", cmd);
 
 						string str_cmd = string(cmd);
-						str_cmd = str_cmd.substr(0, str_cmd.size()-1);
+						//str_cmd = str_cmd.substr(0, str_cmd.size()-1);
+
+						vector<string> command_vec;
+                        command_vec = get_vector_string(str_cmd);
 						//cout<<str_cmd<<"  "<<str_cmd.size()<<"\n";
 
-						if(str_cmd == "AUTHOR") {
-						    // Need to be implemented
+						if(command_vec[0] == "AUTHOR") {
+                            cse4589_print_and_log("[AUTHOR:SUCCESS]\n");
+                            cse4589_print_and_log("I, mh267, have read and understood the course academic integrity policy.\n");
+							cse4589_print_and_log("I, dyadav2, have read and understood the course academic integrity policy.\n");
+							cse4589_print_and_log("I, balasub5, have read and understood the course academic integrity policy.\n");
+                            cse4589_print_and_log("[AUTHOR:END]\n");
 						}
 
-						else if(str_cmd == "IP") {
+						else if(command_vec[0]  == "IP") {
 						    string ip = get_ip();
-        	                cout<<"Ip address from my server code = "<<ip<<"\n";
+        	                //cout<<"Ip address from my server code = "<<ip<<"\n";
+        	                cse4589_print_and_log("[IP:SUCCESS]\n");
+                            cse4589_print_and_log("IP:%s\n", ip.c_str());
+                            cse4589_print_and_log("[IP:END]\n");
 						}
-						else if(str_cmd == "PORT") {
-						    string ip = get_ip();
-        	                cout<<"Port number "<<port<<"\n";
+						else if(command_vec[0]  == "PORT") {
+        	                //cout<<"Port number from my server code = "<<port<<"\n";
+                            cse4589_print_and_log("[PORT:SUCCESS]\n");
+                            cse4589_print_and_log("PORT:%s\n", port);
+                            cse4589_print_and_log("[PORT:END]\n");
 						}
-						else if(str_cmd == "LIST") {
+						else if(command_vec[0]  == "LIST") {
 						    // Need to be implemented
 						    cse4589_print_and_log("[LIST:SUCCESS]\n");
 
@@ -236,7 +252,7 @@ void server_main(int argc, char *port)
 
 						    cse4589_print_and_log("[LIST:END]\n");
 						}
-						else if(str_cmd == "STATISTICS") {
+						else if(command_vec[0]  == "STATISTICS") {
 						    // Need to be implemented
 						    cse4589_print_and_log("[STATISTICS:SUCCESS]\n");
 
@@ -250,9 +266,24 @@ void server_main(int argc, char *port)
 
 						    cse4589_print_and_log("[STATISTICS:END]\n");
 						}
-						else if(str_cmd == "BLOCKED") {
+						else if(command_vec[0]  == "BLOCKED") {
 						    // Need to be implemented
-						}
+						    string blocker_ip = command_vec[1];
+						    for(int i = 0 ; i < client_list.size(); i++) {
+                                client_info cur = client_list[i];
+                                if (blocker_ip != cur.IP) continue;
+
+                                for (int j =0 ; j<cur.blocked_list.size(); j++) {
+                                    struct block_info block_dest;
+                                    block_dest = cur.blocked_list[j];
+                                    cse4589_print_and_log("[BLOCKED:SUCCESS]\n");
+                                    cse4589_print_and_log("%-5d%-35s%-20s%-8d\n",j+1, block_dest.blocked_host_name.c_str(),
+                                                            block_dest.blocked_ip.c_str(), atoi(block_dest.blocked_port.c_str()));
+                                    cse4589_print_and_log("[BLOCKED:END]\n");
+                                }
+
+						    }
+                        }
 						
 						//Process PA1 commands here ...
 						
@@ -287,7 +318,7 @@ void server_main(int argc, char *port)
 						else {
 							//Process incoming data from existing clients here ...
 
-							cout<<"Enter else case\n";
+							//cout<<"Enter else case\n";
 
                             ///*
                             vector<string> command_vec;
@@ -311,12 +342,12 @@ void server_main(int argc, char *port)
                                  //if(send(sock_index, &client_list, strlen(client_list), 0) == strlen(client_list))
                                  //    printf("Done!\n");
                                  //fflush(stdout);
-								 char client_data[2048];
+								char client_data[2048];
 
 								for(int i = 0 ; i < client_list.size(); i++) {
-									cout<<"Inside For";
+									//cout<<"Inside For";
 						        	if(client_list[i].login_status =="logged-in"){
-										cout<<"Inside If";
+										//cout<<"Inside If";
 										strcat(client_data, client_list[i].host_name.c_str());
 										strcat(client_data," ");
 										strcat(client_data, client_list[i].IP.c_str());
@@ -326,18 +357,103 @@ void server_main(int argc, char *port)
 									}
 								}
 
-								cout<<client_data;
+								string send_list_to_client = "";
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+                                     if(client_list[i].login_status =="logged-in"){
+                                        client_info cur = client_list[i];
+                                        send_list_to_client += cur.IP + " ";
+                                        send_list_to_client += cur.PORT + " ";
+                                        send_list_to_client += cur.host_name + "\n";
+                                     }
+                                 }
+
+								cout<<"Client list in server \n"<<send_list_to_client<<"\n";
+								char* client_list_data = (char*) send_list_to_client.c_str();
+
+								if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
+                                     printf("Done SENDING THE DAMN LIST!\n");
+                                 fflush(stdout);
+
+
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+
+                                    client_info cur = client_list[i];
+                                    if (client_ip != cur.IP) continue;
+                                    string send_buffer_msg_to_client = "";
+
+                                    while(!client_list[i].buffer_msg.empty()){
+                                        struct buffer_info cur_buf_msg = client_list[i].buffer_msg.front();
+                                        client_list[i].buffer_msg.pop();
+                                        //send_list_to_client += "BUFFER_IP ";
+                                        send_buffer_msg_to_client += "EVENT ";
+                                        send_buffer_msg_to_client += cur_buf_msg.sender_ip + " ";
+                                        send_buffer_msg_to_client += cur_buf_msg.sender_msg + " ";
+
+                                        cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                        cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", cur_buf_msg.sender_ip.c_str(),
+                                                                client_ip.c_str(), cur_buf_msg.sender_msg.c_str());
+                                        cse4589_print_and_log("[%s:END]\n", "RELAYED");
+										client_list[i].num_msg_rcv += 1;
+
+                                    }
+                                    char * client_list_data = (char*) send_buffer_msg_to_client.c_str();
+
+                                    if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
+                                         printf("Sending msg from Buffer done-->> %s\n", client_list_data);
+
+                                 }
+
+								//cout<<client_data;
                             }
 
                             else if (command_vec[0] == "SEND") {
-                                cout<<"destination IP in server =  "<<command_vec[1]<< "  "<<command_vec[2]<<"\n";
-                                client_info dest_client = get_client_info(command_vec[1]);
+                                cout<<"destination IP in server =  "<<command_vec[1]<< "  "<<command_vec[2]<<" "<<command_vec[3]<<"\n";
+                                client_info dest_client = get_client_info(command_vec[2]);
 
-                                if(dest_client.IP == "None") cout<<"Not in the list\n";
+                                string sender_client = command_vec[1];
+                                string receiver_client = command_vec[2];
+                                string sender_msg = command_vec[3];
+
+                                if(dest_client.IP == "None") cout<<"Destination IP not in the list\n";
                                 else {
-                                    cout<<"Dest IP found\n";
-                                    if(send(dest_client.fd, buffer, strlen(buffer), 0) == strlen(buffer))
-								        printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
+									cout<<"Dest IP found\n";
+									//Logic for updating STATS for Sending Client
+									for(int i = 0 ; i < client_list.size(); i++) {
+										if(client_list[i].IP == sender_client){
+											client_list[i].num_msg_sent += 1;
+										}
+									}
+									
+                                    if(dest_client.login_status == "logged-out") {
+                                        cout<<"Client logged out\n";
+                                        for(int i = 0 ; i < client_list.size(); i++) {
+                                            client_info cur = client_list[i];
+                                            if (receiver_client != cur.IP) continue;
+                                            struct buffer_info buffer_msg;
+                                            buffer_msg.sender_ip = sender_client;
+                                            buffer_msg.sender_msg = sender_msg;
+
+                                            client_list[i].buffer_msg.push(buffer_msg);
+
+                                        }
+                                    }
+                                    else {
+                                        string msg_client = "EVENT " + sender_client + " " + sender_msg;
+                                        char * msg_to_client = (char*) msg_client.c_str();
+                                        if(send(dest_client.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
+                                            //printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
+                                            cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                            cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_client.c_str(), receiver_client.c_str(), sender_msg.c_str());
+                                            cse4589_print_and_log("[%s:END]\n", "RELAYED");
+                                        }
+										//Logic for updating STATS for Receiving Client
+										for(int i = 0 ; i < client_list.size(); i++) {
+											if(client_list[i].IP == receiver_client){
+												client_list[i].num_msg_rcv += 1;
+											}
+										}
+									}
+                                    
 
                                 }
 
@@ -348,6 +464,22 @@ void server_main(int argc, char *port)
                              }
                              else if (command_vec[0] == "BLOCK") {
                                  // Need to be implemented
+                                 string sender_ip = command_vec[1];
+
+                                 string blocked_ip = command_vec[2];
+                                 string blocked_host_name = command_vec[3];
+                                 string blocked_port = command_vec[4];
+
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+                                     client_info cur = client_list[i];
+                                     if (sender_ip != cur.IP) continue;
+
+                                     struct block_info block_dest;
+                                     block_dest.blocked_ip = blocked_ip;
+                                     block_dest.blocked_host_name = blocked_host_name;
+                                     block_dest.blocked_port = blocked_port;
+                                     client_list[i].blocked_list.push_back(block_dest);
+                                 }
                              }
 
                              else if (command_vec[0] == "UNBLOCK") {
@@ -356,9 +488,18 @@ void server_main(int argc, char *port)
                              else if (command_vec[0] == "REFRESH") {
                                  // Need to be implemented
                              }
+
                              else if (command_vec[0] == "LOGOUT") {
                                  // Need to be implemented
+
+                                 string client_ip = command_vec[1];
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+                                    client_info cur = client_list[i];
+                                    if (client_ip != cur.IP) continue;
+                                    client_list[i].login_status = "logged-out";
+                                 }
                              }
+
                              else if (command_vec[0] == "LIST") {
                                  // Need to be implemented
                              }
@@ -366,8 +507,8 @@ void server_main(int argc, char *port)
                                  // Need to be implemented
                              }
 
-                             if(send(sock_index, buffer, strlen(buffer), 0) == strlen(buffer))
-                                     printf("Done!\n");
+                             //if(send(sock_index, buffer, strlen(buffer), 0) == strlen(buffer))
+                              //       printf("common sending to client Done!\n");
                              fflush(stdout);
 
 							//printf("\nClient sent me: %s\n", buffer);
