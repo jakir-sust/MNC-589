@@ -44,6 +44,8 @@
 #include "../include/ip_address.h"
 using namespace std;
 
+//#define BUFFER_SIZE 2048
+
 
 /**
 * main function
@@ -185,7 +187,7 @@ void client_main(int argc, string ip, char *port)
 		int selret = select(head_socket + 1, &watch_list, NULL, NULL, NULL);
 		if(selret < 0)
 			perror("select failed.");
-		else cout<<"Found in select\n";
+		//else cout<<"Found in select\n";
 
 		for(int sock_index=0; sock_index<=head_socket; sock_index+=1){
             if(FD_ISSET(sock_index, &watch_list)){
@@ -195,13 +197,13 @@ void client_main(int argc, string ip, char *port)
                     if(fgets(msg, MSG_SIZE-1, stdin) == NULL) //Mind the newline character that will be written to msg
                         exit(-1);
 
-                    printf("I got: %s (size:%d chars)\n", msg, strlen(msg));
+                    printf("I got: %s from STDIN \n", msg);
 
 
                     vector<string> command_vec;
                     command_vec = get_vector_stringc(msg);
 
-                    cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
+                    //cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
 
                     if (command_vec[0] == "AUTHOR") {
                         // Need to be implemented
@@ -215,8 +217,10 @@ void client_main(int argc, string ip, char *port)
 
                         string cur_ip = get_ip();
                         char* dest_msg = &command_vec[2][0];
-                        char *first2 = add_two_string((char *)"SEND", (char *) &(command_vec[1][0]));
-                        char* added_string = add_two_string(first2, dest_msg);
+                        char *first2 = add_two_string((char *)"SEND", (char *) cur_ip.c_str());
+                        char *first3 = add_two_string(first2, (char *) &(command_vec[1][0]));
+                        char* added_string = add_two_string(first3, dest_msg);
+
 
                         // cout<<added_string<<"\n";
                         msg = added_string;
@@ -226,6 +230,7 @@ void client_main(int argc, string ip, char *port)
                         else
                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
                         cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+
                         fflush(stdout);
 
                     }
@@ -245,7 +250,7 @@ void client_main(int argc, string ip, char *port)
                         if(fdaccept > head_socket) head_socket = fdaccept;
 
 
-                        printf("\nSENDing it to the remote server ... ");
+                        printf("\nLOGIN to the remote server... ");
 
                         char hostname[1024];
                         hostname[1023] = '\0';
@@ -258,18 +263,18 @@ void client_main(int argc, string ip, char *port)
                         char* added_string = add_two_string(first2, port);
                         msg = add_two_string(added_string, hostname);
 
-                        //cout<<msg<<"\n";
                         //msg = added_string;
 
 
                         if(send(server, msg, strlen(msg), 0) == strlen(msg))
-                            printf("Sending to server Done!\n");
+                            printf("LOGIN to server Done!\n");
 
                         fflush(stdout);
 
                         /* Initialize buffer to receieve response */
                         char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
                         memset(buffer, '\0', BUFFER_SIZE);
+
 
                         if(recv(server, buffer, BUFFER_SIZE, 0) >= 0){//process table
                            // printf("Server responded: %s\n\n", buffer);
@@ -347,8 +352,16 @@ void client_main(int argc, string ip, char *port)
                         cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
                     }
                     else if (command_vec[0] == "LOGOUT") {
-                        // Need to be implemented
-                        // clear the previous client list
+
+
+                        string cur_ip = get_ip();
+                        char *added_string = add_two_string((char *)"LOGOUT", (char *) cur_ip.c_str());
+                        msg = added_string;
+
+                        if(send(server, msg, strlen(msg), 0) == strlen(msg))
+                            printf("LOGOUT Done from server!\n");
+                        fflush(stdout);
+
                     }
                     else if (command_vec[0] == "EXIT") {
                         // Need to be implemented
@@ -368,8 +381,21 @@ void client_main(int argc, string ip, char *port)
                         FD_CLR(sock_index, &master_list);
                     }
                     else {
-                        printf("\nServer sent me: %s\n", buffer);
-                        fflush(stdout);
+                        vector<string> command_vec;
+                        command_vec = get_vector_stringc(buffer);
+
+                        if (command_vec[0] == "EVENT") {
+
+                            for (int i=0; i<command_vec.size()-2; i+=3) {
+                                cse4589_print_and_log("[%s:SUCCESS]\n", "RECEIVED");
+                                string sender_ip = command_vec[i+1];
+                                string sender_msg = command_vec[i+2];
+                                cse4589_print_and_log("msg from:%s\n[msg]:%s\n", sender_ip.c_str(), sender_msg.c_str());
+                                cse4589_print_and_log("[%s:END]\n", "RECEIVED");
+                            }
+
+                        }
+
                     }
                 }
 
