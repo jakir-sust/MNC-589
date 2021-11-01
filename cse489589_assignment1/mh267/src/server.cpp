@@ -218,9 +218,10 @@ void server_main(int argc, char *port)
 						//cout<<str_cmd<<"  "<<str_cmd.size()<<"\n";
 
 						if(command_vec[0] == "AUTHOR") {
-						    // Need to be implemented
                             cse4589_print_and_log("[AUTHOR:SUCCESS]\n");
                             cse4589_print_and_log("I, mh267, have read and understood the course academic integrity policy.\n");
+							cse4589_print_and_log("I, dyadav2, have read and understood the course academic integrity policy.\n");
+							cse4589_print_and_log("I, balasub5, have read and understood the course academic integrity policy.\n");
                             cse4589_print_and_log("[AUTHOR:END]\n");
 						}
 
