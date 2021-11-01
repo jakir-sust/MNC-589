@@ -287,11 +287,22 @@ void client_main(int argc, string ip, char *port)
                     }
                     else if (command_vec[0] == "BROADCAST") {
                         // Need to be implemented
-                        if(send(server, "BROADCAST", strlen("BROADCAST"), 0) == strlen("BROADCAST"))
+                        string cur_ip = get_ip();
+                        char* dest_msg = &command_vec[1][0];
+                        char *first2 = add_two_string((char *)"BROADCAST", (char *) cur_ip.c_str());
+                        char* added_string = add_two_string(first2, dest_msg);
+
+
+                        // cout<<added_string<<"\n";
+                        msg = added_string;
+
+                        if(send(server, msg, strlen(msg), 0) == strlen(msg))
                             cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
                         else
                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
                         cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+
+                        fflush(stdout);
                     }
                 	else if(command_vec[0] == "LIST") {
 						    // Need to be implemented
@@ -366,7 +377,18 @@ void client_main(int argc, string ip, char *port)
 
                     }
                     else if (command_vec[0] == "EXIT") {
-                        // Need to be implemented
+                        string cur_ip = get_ip();
+                        char *added_string = add_two_string((char *)"EXIT", (char *) cur_ip.c_str());
+                        // cout<<added_string<<"\n";
+                        msg = added_string;
+
+                        if(send(server, msg, strlen(msg), 0) == strlen(msg))
+                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                        else
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+
+                        fflush(stdout);
                     }
                 }
 
