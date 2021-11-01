@@ -75,6 +75,17 @@ vector<string> get_vector_string(string buffer)
 
     return command_vec;
 }
+
+string get_host_name(string ip)
+{
+    for(int i = 0; i < client_list.size(); i++) {
+        if(client_list[i].IP == ip) {
+            return client_list[i].host_name;
+        }
+    }
+    return "None";
+
+}
 void add_new_client(string IP, string PORT, string client_host_name, int fd, int sock_index)
 {
     if (client_list.size() ==0)
@@ -398,6 +409,7 @@ void server_main(int argc, char *port)
                                     }
                                     char * client_list_data = (char*) send_buffer_msg_to_client.c_str();
 
+                                    if(send_buffer_msg_to_client.size()>0)
                                     if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
                                          printf("Sending msg from Buffer done-->> %s\n", client_list_data);
 
@@ -481,9 +493,12 @@ void server_main(int argc, char *port)
                                  // Need to be implemented
                                  string sender_ip = command_vec[1];
 
+                                 cout<<"In block server "<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
+
                                  string blocked_ip = command_vec[2];
-                                 string blocked_host_name = command_vec[3];
-                                 string blocked_port = command_vec[4];
+                                 string blocked_port = command_vec[3];
+
+                                 string blocked_host_name = get_host_name(blocked_ip);
 
                                  for(int i = 0 ; i < client_list.size(); i++) {
                                      client_info cur = client_list[i];
@@ -494,6 +509,8 @@ void server_main(int argc, char *port)
                                      block_dest.blocked_host_name = blocked_host_name;
                                      block_dest.blocked_port = blocked_port;
                                      client_list[i].blocked_list.push_back(block_dest);
+
+                                     cout<<"In blocked  "<< block_dest.blocked_ip <<" "<<block_dest.blocked_host_name<<" "<<block_dest.blocked_port<<"\n";
                                  }
                              }
 
