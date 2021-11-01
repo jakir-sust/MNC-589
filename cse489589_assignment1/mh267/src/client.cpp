@@ -28,7 +28,8 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netdb.h>
-
+#include <iterator>
+#include <algorithm>
 #include <cstring>
 #include <cstdio>
 #include <iostream>
@@ -63,6 +64,11 @@ vector<string> get_vector_stringc(char* buffer)
     return command_vec;
 }
 
+bool compare(client_info a, client_info b)
+{
+    if (a.PORT < b.PORT) return 1;
+    else return 0;
+}
 vector<string> split_string(string buffer, string delimiter){
 
 
@@ -280,6 +286,19 @@ void client_main(int argc, string ip, char *port)
                     else if (command_vec[0] == "BROADCAST") {
                         // Need to be implemented
                     }
+                	else if(command_vec[0] == "LIST") {
+						    // Need to be implemented
+						    cse4589_print_and_log("[LIST:SUCCESS]\n");
+						    sort(client_list.begin(), client_list.end(), compare);
+
+						    for(int i = 0 ; i < client_list.size(); i++) {
+						        client_info cur = client_list[i];
+						        //cout<<cur.IP<<"\n";
+                                cse4589_print_and_log("%-5d%-35s%-20s%-8d\n", i+1, cur.host_name.c_str(), cur.IP.c_str(), atoi(cur.PORT.c_str()));
+                            }
+
+						    cse4589_print_and_log("[LIST:END]\n");
+					}
                     else if (command_vec[0] == "REFRESH") {
                         int success = 0;
                         char* msg = add_two_string("REFRESH",(char *)get_ip().c_str());
