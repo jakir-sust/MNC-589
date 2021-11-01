@@ -66,7 +66,7 @@ vector<string> get_vector_stringc(char* buffer)
     return command_vec;
 }
 
-bool compare(client_info a, client_info b)
+bool compare_port(client_info a, client_info b)
 {
     if (a.PORT < b.PORT) return 1;
     else return 0;
@@ -234,9 +234,6 @@ void client_main(int argc, string ip, char *port)
                         fflush(stdout);
 
                     }
-                    else if (command_vec[0] == "BROADCAST") {
-                        // Need to be implemented
-                    }
 
                     else if (command_vec[0] == "LOGIN") {
 
@@ -280,7 +277,7 @@ void client_main(int argc, string ip, char *port)
                            // printf("Server responded: %s\n\n", buffer);
                            string temp = string(buffer);
                            vector<string> tuples = split_string(temp,"\n");
-                           for(int i =0; i < tuples.size(); i++){
+                           for(int i = 0; i < tuples.size()-1; i++){
                                struct client_info c = parse_tuple(tuples.at(i));
                                client_list.push_back(c);
                            }
@@ -290,11 +287,16 @@ void client_main(int argc, string ip, char *port)
                     }
                     else if (command_vec[0] == "BROADCAST") {
                         // Need to be implemented
+                        if(send(server, "BROADCAST", strlen("BROADCAST"), 0) == strlen("BROADCAST"))
+                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                        else
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
                     }
                 	else if(command_vec[0] == "LIST") {
 						    // Need to be implemented
 						    cse4589_print_and_log("[LIST:SUCCESS]\n");
-						    sort(client_list.begin(), client_list.end(), compare);
+						    sort(client_list.begin(), client_list.end(), compare_port);
 
 						    for(int i = 0 ; i < client_list.size(); i++) {
 						        client_info cur = client_list[i];
