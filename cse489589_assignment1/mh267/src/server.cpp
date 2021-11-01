@@ -326,6 +326,11 @@ void server_main(int argc, char *port)
 									}
 								}
 
+								if(send(sock_index, &client_data, strlen(client_data), 0) == strlen(client_data))
+                                     printf("Done SENDING THE DAMN LIST!\n");
+                                 fflush(stdout);
+								
+
 								cout<<client_data;
                             }
 
