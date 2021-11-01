@@ -438,6 +438,7 @@ void server_main(int argc, char *port)
 									for (b = destination.blocked_list.begin(); b!=destination.blocked_list.end(); ++b){
 										if(b->blocked_ip == sender_client){
 											block_flag = 1;
+											//cout<<"Blocked found\n";
 										}
 									}
 									if(block_flag == 0){
@@ -493,7 +494,7 @@ void server_main(int argc, char *port)
                                  // Need to be implemented
                                  string sender_ip = command_vec[1];
 
-                                 cout<<"In block server "<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
+                                 //cout<<"In block server "<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
 
                                  string blocked_ip = command_vec[2];
                                  string blocked_port = command_vec[3];
@@ -510,12 +511,50 @@ void server_main(int argc, char *port)
                                      block_dest.blocked_port = blocked_port;
                                      client_list[i].blocked_list.push_back(block_dest);
 
-                                     cout<<"In blocked  "<< block_dest.blocked_ip <<" "<<block_dest.blocked_host_name<<" "<<block_dest.blocked_port<<"\n";
+                                     //cout<<"In blocked  "<< block_dest.blocked_ip <<" "<<block_dest.blocked_host_name<<" "<<block_dest.blocked_port<<"\n";
                                  }
                              }
 
                              else if (command_vec[0] == "UNBLOCK") {
                                  // Need to be implemented
+
+                                 string sender_ip = command_vec[1];
+
+                                 //cout<<"In Unblock block"<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
+
+                                 string blocked_ip = command_vec[2];
+                                 string blocked_port = command_vec[3];
+
+                                 string blocked_host_name = get_host_name(blocked_ip);
+
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+                                     client_info cur = client_list[i];
+                                     if (sender_ip != cur.IP) continue;
+
+                                     struct block_info block_dest;
+                                     block_dest.blocked_ip = blocked_ip;
+                                     block_dest.blocked_host_name = blocked_host_name;
+                                     block_dest.blocked_port = blocked_port;
+                                     //client_list[i].blocked_list.push_back(block_dest);
+
+                                     int block_found = 0;
+                                     int cnt = 0;
+                                     //cout<<"Before size === "<<client_list[i].blocked_list.size()<<"\n";
+                                     for(int j =0; j< client_list[i].blocked_list.size(); j++){
+                                        struct block_info block_dest = client_list[i].blocked_list[j];
+                                        if(block_dest.blocked_ip == blocked_ip){
+                                           block_found = 1;
+                                           //cout<<"Unblocking done\n";
+                                           break;
+                                        }
+                                        cnt +=1;
+                                     }
+                                     if (block_found == 1){
+                                        client_list[i].blocked_list.erase(client_list[i].blocked_list.begin() + cnt);
+                                        //int sz = client_list[i].blocked_list.size();
+                                        //cout<<"In Unblocked done  "<<sz<<" "<< client_list[i].blocked_list[sz-1].blocked_ip<<" "<<cnt<<"\n";
+                                     }
+                                 }
                              }
                              else if (command_vec[0] == "REFRESH") {
                                  // Need to be implemented
