@@ -1,10 +1,15 @@
 #include <string>
 #include <vector>
+#include <queue>
 
 #ifndef SERVER_H_
 #define SERVER_H_
 using namespace std;
 
+struct buffer_info{
+    string sender_ip;
+    string sender_msg;
+};
 struct client_info{
   string IP;
   string PORT;
@@ -15,6 +20,8 @@ struct client_info{
   int num_msg_rcv;
   string login_status;
   vector<string> blocked_list;
+
+  queue<buffer_info> buffer_msg;
 };
 
 vector<string> get_vector_string(string buffer);
