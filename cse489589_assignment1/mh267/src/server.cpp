@@ -414,10 +414,22 @@ void server_main(int argc, char *port)
                                 string receiver_client = command_vec[2];
                                 string sender_msg = command_vec[3];
 
+								int block_flag = 0;
+
+
                                 if(dest_client.IP == "None") cout<<"Destination IP not in the list\n";
                                 else {
 									cout<<"Dest IP found\n";
-									//Logic for updating STATS for Sending Client
+									//Logic to check if destination client is blocked
+									struct client_info destination = get_client_info(receiver_client);
+									vector<block_info>::iterator b;
+									for (b = destination.blocked_list.begin(); b!=destination.blocked_list.end(); ++b){
+										if(b->blocked_ip == sender_client){
+											block_flag = 1;
+										}
+									}
+									if(block_flag == 0){
+										//Logic for updating STATS for Sending Client
 									for(int i = 0 ; i < client_list.size(); i++) {
 										if(client_list[i].IP == sender_client){
 											client_list[i].num_msg_sent += 1;
@@ -453,6 +465,9 @@ void server_main(int argc, char *port)
 											}
 										}
 									}
+
+									}
+									
                                     
 
                                 }
