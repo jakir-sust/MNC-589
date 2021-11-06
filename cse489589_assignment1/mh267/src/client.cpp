@@ -95,7 +95,7 @@ struct client_info parse_tuple(string tuple){
     info.IP = split_str.at(0);
     info.PORT = split_str.at(1);
     info.host_name = split_str.at(2);
-    info.login_status = split_str.at(3);
+    //info.login_status = split_str.at(3);
     return info;
 }
 
@@ -238,7 +238,7 @@ void client_main(int argc, string ip, char *port)
                             cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
                         else
                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
-                        cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        //cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
 
                         fflush(stdout);
 
@@ -285,8 +285,10 @@ void client_main(int argc, string ip, char *port)
                         memset(buffer, '\0', BUFFER_SIZE);
 
 
+
+
                         if(recv(server, buffer, BUFFER_SIZE, 0) >= 0){//process table
-                           // printf("Server responded: %s\n\n", buffer);
+                          // printf("Server responded: %s\n\n", buffer);
                            string temp = string(buffer);
                            vector<string> tuples = split_string(temp,"\n");
                            for(int i = 0; i < tuples.size()-1; i++){
@@ -337,7 +339,7 @@ void client_main(int argc, string ip, char *port)
 					}
                     else if (command_vec[0] == "REFRESH") {
                         int success = 0;
-                        char* msg = add_two_string("REFRESH",(char *)get_ip().c_str());
+                        char* msg = add_two_string((char*) "REFRESH",(char *)get_ip().c_str());
                         if(send(server, msg, strlen(msg), 0) == strlen(msg))
                             success = 1;   
                     }

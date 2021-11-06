@@ -76,6 +76,17 @@ vector<string> get_vector_string(string buffer)
 
     return command_vec;
 }
+
+string get_host_name(string ip)
+{
+    for(int i = 0; i < client_list.size(); i++) {
+        if(client_list[i].IP == ip) {
+            return client_list[i].host_name;
+        }
+    }
+    return "None";
+
+}
 void add_new_client(string IP, string PORT, string client_host_name, int fd, int sock_index)
 {
     if (client_list.size() ==0)
@@ -399,6 +410,7 @@ void server_main(int argc, char *port)
                                     }
                                     char * client_list_data = (char*) send_buffer_msg_to_client.c_str();
 
+                                    if(send_buffer_msg_to_client.size()>0)
                                     if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
                                         //  printf("Sending msg from Buffer done-->> %s\n", client_list_data);
                                         continue;
@@ -416,12 +428,24 @@ void server_main(int argc, char *port)
                                 string receiver_client = command_vec[2];
                                 string sender_msg = command_vec[3];
 
+								int block_flag = 0;
+
+
                                 if(dest_client.IP == "None") 
-                                // cout<<"Destination IP not in the list\n";
                                     cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
                                 else {
-									// cout<<"Dest IP found\n";
-									//Logic for updating STATS for Sending Client
+									cout<<"Dest IP found\n";
+									//Logic to check if destination client is blocked
+									struct client_info destination = get_client_info(receiver_client);
+									vector<block_info>::iterator b;
+									for (b = destination.blocked_list.begin(); b!=destination.blocked_list.end(); ++b){
+										if(b->blocked_ip == sender_client){
+											block_flag = 1;
+											//cout<<"Blocked found\n";
+										}
+									}
+									if(block_flag == 0){
+										//Logic for updating STATS for Sending Client
 									for(int i = 0 ; i < client_list.size(); i++) {
 										if(client_list[i].IP == sender_client){
 											client_list[i].num_msg_sent += 1;
@@ -457,6 +481,9 @@ void server_main(int argc, char *port)
 											}
 										}
 									}
+
+									}
+									
                                     
 
                                 }
@@ -470,9 +497,12 @@ void server_main(int argc, char *port)
                                  // Need to be implemented
                                  string sender_ip = command_vec[1];
 
+                                 //cout<<"In block server "<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
+
                                  string blocked_ip = command_vec[2];
-                                 string blocked_host_name = command_vec[3];
-                                 string blocked_port = command_vec[4];
+                                 string blocked_port = command_vec[3];
+
+                                 string blocked_host_name = get_host_name(blocked_ip);
 
                                  for(int i = 0 ; i < client_list.size(); i++) {
                                      client_info cur = client_list[i];
@@ -483,11 +513,51 @@ void server_main(int argc, char *port)
                                      block_dest.blocked_host_name = blocked_host_name;
                                      block_dest.blocked_port = blocked_port;
                                      client_list[i].blocked_list.push_back(block_dest);
+
+                                     //cout<<"In blocked  "<< block_dest.blocked_ip <<" "<<block_dest.blocked_host_name<<" "<<block_dest.blocked_port<<"\n";
                                  }
                              }
 
                              else if (command_vec[0] == "UNBLOCK") {
                                  // Need to be implemented
+
+                                 string sender_ip = command_vec[1];
+
+                                 //cout<<"In Unblock block"<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
+
+                                 string blocked_ip = command_vec[2];
+                                 string blocked_port = command_vec[3];
+
+                                 string blocked_host_name = get_host_name(blocked_ip);
+
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+                                     client_info cur = client_list[i];
+                                     if (sender_ip != cur.IP) continue;
+
+                                     struct block_info block_dest;
+                                     block_dest.blocked_ip = blocked_ip;
+                                     block_dest.blocked_host_name = blocked_host_name;
+                                     block_dest.blocked_port = blocked_port;
+                                     //client_list[i].blocked_list.push_back(block_dest);
+
+                                     int block_found = 0;
+                                     int cnt = 0;
+                                     //cout<<"Before size === "<<client_list[i].blocked_list.size()<<"\n";
+                                     for(int j =0; j< client_list[i].blocked_list.size(); j++){
+                                        struct block_info block_dest = client_list[i].blocked_list[j];
+                                        if(block_dest.blocked_ip == blocked_ip){
+                                           block_found = 1;
+                                           //cout<<"Unblocking done\n";
+                                           break;
+                                        }
+                                        cnt +=1;
+                                     }
+                                     if (block_found == 1){
+                                        client_list[i].blocked_list.erase(client_list[i].blocked_list.begin() + cnt);
+                                        //int sz = client_list[i].blocked_list.size();
+                                        //cout<<"In Unblocked done  "<<sz<<" "<< client_list[i].blocked_list[sz-1].blocked_ip<<" "<<cnt<<"\n";
+                                     }
+                                 }
                              }
                              else if (command_vec[0] == "REFRESH") {
                                  // Need to be implemented
