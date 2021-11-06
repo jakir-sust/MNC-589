@@ -58,7 +58,7 @@ using namespace std;
 */
 vector<client_info> client_list;
 
-bool compare_port(client_info a, client_info b)
+bool compare_ports(client_info a, client_info b)
 {
     if (atoi( a.PORT.c_str() ) < atoi( b.PORT.c_str() )) return 1;
     else return 0;
@@ -146,7 +146,7 @@ void server_main(int argc, char *port)
 		//printf("Usage:%s [port]\n", argv[0]);
 		exit(-1);
 	}
-	std:://cout<<"Port number in server ==   "<<port<<"\n";
+	//std::cout<<"Port number in server ==   "<<port<<"\n";
 	
 	int server_socket, head_socket, selret, sock_index, fdaccept=0, caddr_len;
 	struct sockaddr_in client_addr;
@@ -253,7 +253,7 @@ void server_main(int argc, char *port)
 						    // Need to be implemented
 						    cse4589_print_and_log("[LIST:SUCCESS]\n");
 
-						    sort(client_list.begin(), client_list.end(), compare_port);
+						    sort(client_list.begin(), client_list.end(), compare_ports);
 
 						    for(int i = 0 ; i < client_list.size(); i++) {
 						        client_info cur = client_list[i];
@@ -267,7 +267,7 @@ void server_main(int argc, char *port)
 						    // Need to be implemented
 						    cse4589_print_and_log("[STATISTICS:SUCCESS]\n");
 
-						    sort(client_list.begin(), client_list.end(), compare_port);
+						    sort(client_list.begin(), client_list.end(), compare_ports);
 
 						    for(int i = 0 ; i < client_list.size(); i++) {
 						        client_info cur = client_list[i];
@@ -433,61 +433,63 @@ void server_main(int argc, char *port)
 								int block_flag = 0;
 
 
-                                if(dest_client.IP == "None") //cout<<"Destination IP not in the list\n";
+                                if(dest_client.IP == "None") {
+                                //cout<<"Destination IP not in the list\n";
+                                }
+                                else {
+                                    //cout<<"Dest IP found\n";
+                                    //Logic to check if destination client is blocked
+                                    struct client_info destination = get_client_info(receiver_client);
+                                    vector<block_info>::iterator b;
+                                    for (b = destination.blocked_list.begin(); b!=destination.blocked_list.end(); ++b){
+                                        if(b->blocked_ip == sender_client){
+                                            block_flag = 1;
+                                            ////cout<<"Blocked found\n";
+                                        }
+                                    }
+                                    if(block_flag == 0){
+                                        //Logic for updating STATS for Sending Client
+                                        for(int i = 0 ; i < client_list.size(); i++) {
+                                            if(client_list[i].IP == sender_client){
+                                            client_list[i].num_msg_sent += 1;
+                                        }
+                                    }
+
+                                    if(dest_client.login_status == "logged-out") {
+                                        //cout<<"Client logged out\n";
+                                        for(int i = 0 ; i < client_list.size(); i++) {
+                                            client_info cur = client_list[i];
+                                                if (receiver_client != cur.IP) continue;
+                                            struct buffer_info buffer_msg;
+                                            buffer_msg.sender_ip = sender_client;
+                                            buffer_msg.sender_msg = sender_msg;
+
+                                            client_list[i].buffer_msg.push(buffer_msg);
+
+                                        }
+                                    }
                                     else {
-									    //cout<<"Dest IP found\n";
-									    //Logic to check if destination client is blocked
-									    struct client_info destination = get_client_info(receiver_client);
-									    vector<block_info>::iterator b;
-									    for (b = destination.blocked_list.begin(); b!=destination.blocked_list.end(); ++b){
-										    if(b->blocked_ip == sender_client){
-											    block_flag = 1;
-											    ////cout<<"Blocked found\n";
-										    }
-									    }
-									    if(block_flag == 0){
-										    //Logic for updating STATS for Sending Client
-									        for(int i = 0 ; i < client_list.size(); i++) {
-										        if(client_list[i].IP == sender_client){
-											    client_list[i].num_msg_sent += 1;
-										    }
-									    }
-									
-                                        if(dest_client.login_status == "logged-out") {
-                                            //cout<<"Client logged out\n";
-                                            for(int i = 0 ; i < client_list.size(); i++) {
-                                                client_info cur = client_list[i];
-                                                    if (receiver_client != cur.IP) continue;
-                                                struct buffer_info buffer_msg;
-                                                buffer_msg.sender_ip = sender_client;
-                                                buffer_msg.sender_msg = sender_msg;
-
-                                                client_list[i].buffer_msg.push(buffer_msg);
-
+                                        string msg_client = "EVENT " + sender_client + " " + sender_msg;
+                                        char * msg_to_client = (char*) msg_client.c_str();
+                                        if(send(dest_client.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
+                                            //printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
+                                            cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                            cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_client.c_str(), receiver_client.c_str(), sender_msg.c_str());
+                                            cse4589_print_and_log("[%s:END]\n", "RELAYED");
+                                        }
+                                        //Logic for updating STATS for Receiving Client
+                                        for(int i = 0 ; i < client_list.size(); i++) {
+                                            if(client_list[i].IP == receiver_client){
+                                                client_list[i].num_msg_rcv += 1;
                                             }
                                         }
-                                        else {
-                                            string msg_client = "EVENT " + sender_client + " " + sender_msg;
-                                            char * msg_to_client = (char*) msg_client.c_str();
-                                            if(send(dest_client.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
-                                                //printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
-                                                cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
-                                                cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_client.c_str(), receiver_client.c_str(), sender_msg.c_str());
-                                                cse4589_print_and_log("[%s:END]\n", "RELAYED");
-                                            }
-										    //Logic for updating STATS for Receiving Client
-										    for(int i = 0 ; i < client_list.size(); i++) {
-											    if(client_list[i].IP == receiver_client){
-												    client_list[i].num_msg_rcv += 1;
-											    }
-										    }
-									    }
-
                                     }
-									
-                                    
 
                                 }
+
+
+
+                            }
 
                             }
 
