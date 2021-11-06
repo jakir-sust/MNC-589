@@ -64,6 +64,12 @@ bool compare_ports(client_info a, client_info b)
     else return 0;
 }
 
+bool compare_blocked_ports(block_info a, block_info b)
+{
+    if (atoi( a.blocked_port.c_str() ) < atoi( b.blocked_port.c_str() )) return 1;
+    else return 0;
+}
+
 vector<string> get_vector_string(string buffer)
 {
     string command = buffer;
@@ -257,6 +263,7 @@ void server_main(int argc, char *port)
 
 						    for(int i = 0 ; i < client_list.size(); i++) {
 						        client_info cur = client_list[i];
+						        if(client_list[i].login_status != "logged-in") continue;
 						        ////cout<<cur.IP<<"\n";
                                 cse4589_print_and_log("%-5d%-35s%-20s%-8d\n", i+1, cur.host_name.c_str(), cur.IP.c_str(), atoi(cur.PORT.c_str()));
                             }
@@ -284,6 +291,7 @@ void server_main(int argc, char *port)
                                 client_info cur = client_list[i];
                                 if (blocker_ip != cur.IP) continue;
 
+                                sort(cur.blocked_list.begin(), cur.blocked_list.end(), compare_blocked_ports);
                                 for (int j =0 ; j<cur.blocked_list.size(); j++) {
                                     struct block_info block_dest;
                                     block_dest = cur.blocked_list[j];
@@ -619,7 +627,6 @@ void server_main(int argc, char *port)
                              }
 
                              else if (command_vec[0] == "LOGOUT") {
-                                 // Need to be implemented
 
                                  string client_ip = command_vec[1];
                                  for(int i = 0 ; i < client_list.size(); i++) {
@@ -629,9 +636,6 @@ void server_main(int argc, char *port)
                                  }
                              }
 
-                             else if (command_vec[0] == "LIST") {
-                                 // Need to be implemented
-                             }
                              else if (command_vec[0] == "EXIT") {
                                  // Need to be implemented
                              }
