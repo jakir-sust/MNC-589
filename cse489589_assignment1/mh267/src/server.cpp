@@ -61,7 +61,7 @@ vector<client_info> client_list;
 bool compare(client_info a, client_info b)
 {
 
-    if (std::stoi(a.PORT) < std::stoi(b.PORT)) return 1;
+    if (atoi( a.PORT.c_str() ) < atoi( b.PORT.c_str() )) return 1;
     else return 0;
 }
 

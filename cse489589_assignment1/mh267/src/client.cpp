@@ -70,7 +70,7 @@ vector<string> get_vector_stringc(char* buffer)
 bool compare_port(client_info a, client_info b)
 {
 
-    if (std::stoi(a.PORT) < std::stoi(b.PORT)) return 1;
+    if (atoi( a.PORT.c_str() ) < atoi( b.PORT.c_str() )) return 1;
     else return 0;
 }
 vector<string> split_string(string buffer, string delimiter){
