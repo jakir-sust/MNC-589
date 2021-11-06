@@ -197,7 +197,7 @@ void client_main(int argc, string ip, char *port)
                     if(fgets(msg, MSG_SIZE-1, stdin) == NULL) //Mind the newline character that will be written to msg
                         exit(-1);
 
-                    printf("I got: %s from STDIN \n", msg);
+                    // printf("I got: %s from STDIN \n", msg);
 
 
                     vector<string> command_vec;
@@ -247,7 +247,7 @@ void client_main(int argc, string ip, char *port)
                         if(fdaccept > head_socket) head_socket = fdaccept;
 
 
-                        printf("\nLOGIN to the remote server... ");
+                        // printf("\nLOGIN to the remote server... ");
 
                         char hostname[1024];
                         hostname[1023] = '\0';
@@ -264,7 +264,10 @@ void client_main(int argc, string ip, char *port)
 
 
                         if(send(server, msg, strlen(msg), 0) == strlen(msg))
-                            printf("LOGIN to server Done!\n");
+                            // printf("LOGIN to server Done!\n");
+                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                        else
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
 
                         fflush(stdout);
 
@@ -283,7 +286,7 @@ void client_main(int argc, string ip, char *port)
                            }
                             fflush(stdout);
                         }
-
+                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
                     }
                     else if (command_vec[0] == "BROADCAST") {
                         // Need to be implemented
@@ -300,7 +303,7 @@ void client_main(int argc, string ip, char *port)
                             cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
                         else
                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
-                        cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
 
                         fflush(stdout);
                     }
