@@ -107,9 +107,9 @@ void add_new_client(string IP, string PORT, string client_host_name, int fd, int
 
     for(int i = 0; i < client_list.size(); i++)
     {
-        cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
+        // cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
     }
-    cout<<"--------------------------------------------------\n";
+    // cout<<"--------------------------------------------------\n";
 }
 
 client_info get_client_info(string IP)
@@ -135,7 +135,7 @@ void server_main(int argc, char *port)
 		//printf("Usage:%s [port]\n", argv[0]);
 		exit(-1);
 	}
-	std::cout<<"Port number in server ==   "<<port<<"\n";
+	// std::cout<<"Port number in server ==   "<<port<<"\n";
 	
 	int server_socket, head_socket, selret, sock_index, fdaccept=0, caddr_len;
 	struct sockaddr_in client_addr;
@@ -208,7 +208,7 @@ void server_main(int argc, char *port)
 						if(fgets(cmd, CMD_SIZE-1, stdin) == NULL) //Mind the newline character that will be written to cmd
 							exit(-1);
 						
-						printf("\nServer  got the message : %s\n", cmd);
+						// printf("\nServer  got the message : %s\n", cmd);
 
 						string str_cmd = string(cmd);
 						//str_cmd = str_cmd.substr(0, str_cmd.size()-1);
@@ -296,7 +296,7 @@ void server_main(int argc, char *port)
 						if(fdaccept < 0)
 							perror("Accept failed.");
 						
-						printf("\nRemote Host connected!\n");
+						// printf("\nRemote Host connected!\n");
 
 						/* Add to watched socket list */
 						FD_SET(fdaccept, &master_list);
@@ -310,7 +310,7 @@ void server_main(int argc, char *port)
 						
 						if(recv(sock_index, buffer, BUFFER_SIZE, 0) <= 0){
 							close(sock_index);
-							printf("Remote Host terminated connection!\n");
+							// printf("Remote Host terminated connection!\n");
 							
 							/* Remove from watched list */
 							FD_CLR(sock_index, &master_list);
@@ -325,7 +325,7 @@ void server_main(int argc, char *port)
 
                             string buffer_str = string(buffer);
 
-                            cout<<"Client sent to me BUFFER string ====  "<<buffer_str<<"\n";
+                            // cout<<"Client sent to me BUFFER string ====  "<<buffer_str<<"\n";
 
                             command_vec = get_vector_string(buffer);
                             //if (command_vec[0] == "LOGIN") {
@@ -371,7 +371,7 @@ void server_main(int argc, char *port)
 								char* client_list_data = (char*) send_list_to_client.c_str();
 
 								if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
-                                     printf("Done SENDING THE DAMN LIST!\n");
+                                    //  printf("Done SENDING THE DAMN LIST!\n");
                                  fflush(stdout);
 
 
@@ -399,7 +399,8 @@ void server_main(int argc, char *port)
                                     char * client_list_data = (char*) send_buffer_msg_to_client.c_str();
 
                                     if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
-                                         printf("Sending msg from Buffer done-->> %s\n", client_list_data);
+                                        //  printf("Sending msg from Buffer done-->> %s\n", client_list_data);
+                                        continue;
 
                                  }
 
@@ -414,9 +415,11 @@ void server_main(int argc, char *port)
                                 string receiver_client = command_vec[2];
                                 string sender_msg = command_vec[3];
 
-                                if(dest_client.IP == "None") cout<<"Destination IP not in the list\n";
+                                if(dest_client.IP == "None") 
+                                // cout<<"Destination IP not in the list\n";
+                                    cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
                                 else {
-									cout<<"Dest IP found\n";
+									// cout<<"Dest IP found\n";
 									//Logic for updating STATS for Sending Client
 									for(int i = 0 ; i < client_list.size(); i++) {
 										if(client_list[i].IP == sender_client){
@@ -425,7 +428,7 @@ void server_main(int argc, char *port)
 									}
 									
                                     if(dest_client.login_status == "logged-out") {
-                                        cout<<"Client logged out\n";
+                                        // cout<<"Client logged out\n";
                                         for(int i = 0 ; i < client_list.size(); i++) {
                                             client_info cur = client_list[i];
                                             if (receiver_client != cur.IP) continue;
