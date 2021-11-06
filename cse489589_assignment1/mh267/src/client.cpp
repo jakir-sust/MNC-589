@@ -316,6 +316,12 @@ void client_main(int argc, string ip, char *port)
 
                         fflush(stdout);
                     }
+                    else if(command_vec[0]  == "PORT") {
+        	                //cout<<"Port number from my server code = "<<port<<"\n";
+                            cse4589_print_and_log("[PORT:SUCCESS]\n");
+                            cse4589_print_and_log("PORT:%s\n", port);
+                            cse4589_print_and_log("[PORT:END]\n");
+					}
                 	else if(command_vec[0] == "LIST") {
 						    // Need to be implemented
 						    cse4589_print_and_log("[LIST:SUCCESS]\n");
