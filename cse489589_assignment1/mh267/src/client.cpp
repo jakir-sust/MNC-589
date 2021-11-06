@@ -67,7 +67,7 @@ vector<string> get_vector_stringc(char* buffer)
 }
 
 
-bool compare(client_info a, client_info b)
+bool compare_port(client_info a, client_info b)
 {
 
     if (std::stoi(a.PORT) < std::stoi(b.PORT)) return 1;
