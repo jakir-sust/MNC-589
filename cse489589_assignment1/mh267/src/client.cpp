@@ -33,6 +33,7 @@
 #include <cstdio>
 #include <iostream>
 #include <stdio.h>
+#include <algorithm>
 
 #include <sstream>
 #include <iterator>
@@ -53,6 +54,12 @@ using namespace std;
 * @param  argv The argument list
 * @return 0 EXIT_SUCCESS
 */
+
+bool compare_port(client_info a, client_info b)
+{
+    if (a.PORT < b.PORT) return 1;
+    else return 0;
+}
 vector<string> get_vector_stringc(char* buffer)
 {
     string command = string(buffer);
@@ -200,6 +207,11 @@ void client_main(int argc, string ip, char *port)
                     //cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
 
                     if (command_vec[0] == "AUTHOR") {
+                            cse4589_print_and_log("[AUTHOR:SUCCESS]\n");
+                            cse4589_print_and_log("I, mh267, have read and understood the course academic integrity policy.\n");
+							cse4589_print_and_log("I, dyadav2, have read and understood the course academic integrity policy.\n");
+							cse4589_print_and_log("I, balasub5, have read and understood the course academic integrity policy.\n");
+                            cse4589_print_and_log("[AUTHOR:END]\n");
                         // Need to be implemented
                     }
                     else if (command_vec[0] == "IP") {
@@ -223,13 +235,30 @@ void client_main(int argc, string ip, char *port)
                             cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
                         else
                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
-                        //cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
 
                         fflush(stdout);
 
                     }
                     else if (command_vec[0] == "BROADCAST") {
-                        // Need to be implemented
+
+                        string cur_ip = get_ip();
+                        char* dest_msg = &command_vec[1][0];
+                        char *first2 = add_two_string((char *)"SEND", (char *) cur_ip.c_str());
+                        //char *first3 = add_two_string(first2, (char *) &(command_vec[1][0]));
+                        char* added_string = add_two_string(first2, dest_msg);
+
+
+                        // cout<<added_string<<"\n";
+                        msg = added_string;
+
+                        if(send(server, msg, strlen(msg), 0) == strlen(msg))
+                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                        else
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+
+                        fflush(stdout);
                     }
 
                     else if (command_vec[0] == "LOGIN") {
@@ -257,20 +286,17 @@ void client_main(int argc, string ip, char *port)
                         char* added_string = add_two_string(first2, port);
                         msg = add_two_string(added_string, hostname);
 
-                        //msg = added_string;
-
-
                         if(send(server, msg, strlen(msg), 0) == strlen(msg))
-                            printf("LOGIN to server Done!\n");
+                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                        else
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
 
                         fflush(stdout);
 
                         /* Initialize buffer to receieve response */
                         char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
                         memset(buffer, '\0', BUFFER_SIZE);
-
-
-
 
                         if(recv(server, buffer, BUFFER_SIZE, 0) >= 0){//process table
                           // printf("Server responded: %s\n\n", buffer);
@@ -285,15 +311,46 @@ void client_main(int argc, string ip, char *port)
                         }
 
                     }
-                    else if (command_vec[0] == "BROADCAST") {
-                        // Need to be implemented
-                    }
                     else if (command_vec[0] == "REFRESH") {
                         int success = 0;
                         char* msg = add_two_string((char*) "REFRESH",(char *)get_ip().c_str());
                         if(send(server, msg, strlen(msg), 0) == strlen(msg))
-                            success = 1;   
+                            success = 1;
+
+                        char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
+                        memset(buffer, '\0', BUFFER_SIZE);
+
+                        if(recv(server, buffer, BUFFER_SIZE, 0) >= 0){//process table
+                          // printf("Server responded: %s\n\n", buffer);
+                           string temp = string(buffer);
+                           vector<string> tuples = split_string(temp,"\n");
+                           //printf("Server responded: 1  %d\n\n", tuples.size());
+                           client_list.clear();
+                           for(int i =0; i < tuples.size() - 1; i++){
+                               struct client_info c = parse_tuple(tuples.at(i));
+                               client_list.push_back(c);
+                           }
+                            fflush(stdout);
+                        }
+                        if(success == 0)
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        else
+                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
                     }
+                    else if(command_vec[0] == "LIST") {
+                        // Need to be implemented
+                        cse4589_print_and_log("[LIST:SUCCESS]\n");
+                        sort(client_list.begin(), client_list.end(), compare_port);
+
+                        for(int i = 0 ; i < client_list.size(); i++) {
+                            client_info cur = client_list[i];
+                            //cout<<cur.IP<<"\n";
+                            cse4589_print_and_log("%-5d%-35s%-20s%-8d\n", i+1, cur.host_name.c_str(), cur.IP.c_str(), atoi(cur.PORT.c_str()));
+                        }
+
+                        cse4589_print_and_log("[LIST:END]\n");
+					}
                     else if (command_vec[0] == "BLOCK") {
                         // Need to be implemented
                         char* first = add_two_string((char*)"BLOCK",(char *)get_ip().c_str());
@@ -336,19 +393,37 @@ void client_main(int argc, string ip, char *port)
                         cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
                     }
                     else if (command_vec[0] == "LOGOUT") {
-
-
                         string cur_ip = get_ip();
                         char *added_string = add_two_string((char *)"LOGOUT", (char *) cur_ip.c_str());
                         msg = added_string;
-
+                        int success = 0;
                         if(send(server, msg, strlen(msg), 0) == strlen(msg))
-                            printf("LOGOUT Done from server!\n");
+                            success = 1;
+
+                        if(success == 0)
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        else
+                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+
                         fflush(stdout);
 
                     }
                     else if (command_vec[0] == "EXIT") {
-                        // Need to be implemented
+                        string cur_ip = get_ip();
+                        char *added_string = add_two_string((char *)"EXIT", (char *) cur_ip.c_str());
+                        msg = added_string;
+                        int success = 0;
+                        if(send(server, msg, strlen(msg), 0) == strlen(msg))
+                            success = 1;
+
+                        if(success == 0)
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                        else
+                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+
+                        fflush(stdout);
                     }
                 }
 
