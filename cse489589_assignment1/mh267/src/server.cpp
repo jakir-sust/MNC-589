@@ -58,9 +58,9 @@ using namespace std;
 */
 vector<client_info> client_list;
 
-bool compare(client_info a, client_info b)
+bool compare_port(client_info a, client_info b)
 {
-    if (a.PORT < b.PORT) return 1;
+    if (atoi( a.PORT.c_str() ) < atoi( b.PORT.c_str() )) return 1;
     else return 0;
 }
 
@@ -90,7 +90,7 @@ void add_new_client(string IP, string PORT, string client_host_name, int fd, int
 {
     if (client_list.size() ==0)
     {
-        //cout<<"Empty logged in clients\n";
+        ////cout<<"Empty logged in clients\n";
     }
 
     int client_exist = 0;
@@ -118,9 +118,9 @@ void add_new_client(string IP, string PORT, string client_host_name, int fd, int
 
     for(int i = 0; i < client_list.size(); i++)
     {
-        cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
+        //cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
     }
-    cout<<"--------------------------------------------------\n";
+    //cout<<"--------------------------------------------------\n";
 }
 
 client_info get_client_info(string IP)
@@ -130,13 +130,13 @@ client_info get_client_info(string IP)
     client_with_IP.IP = "None";
     for(int i = 0; i < client_list.size(); i++)
     {
-        //cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
+        ////cout<<"Client info list   "<<client_list[i].IP<< " "<<client_list[i].PORT<<" "<<client_list[i].fd<< " "<<client_list[i].socket_index<<"\n";
         if(client_list[i].IP == IP) {
             client_with_IP = client_list[i];
             break;
         }
     }
-    //cout<<"After getting client info   "<<client_with_IP.IP<<"\n";
+    ////cout<<"After getting client info   "<<client_with_IP.IP<<"\n";
     return client_with_IP;
 }
 
@@ -146,7 +146,7 @@ void server_main(int argc, char *port)
 		//printf("Usage:%s [port]\n", argv[0]);
 		exit(-1);
 	}
-	std::cout<<"Port number in server ==   "<<port<<"\n";
+	std:://cout<<"Port number in server ==   "<<port<<"\n";
 	
 	int server_socket, head_socket, selret, sock_index, fdaccept=0, caddr_len;
 	struct sockaddr_in client_addr;
@@ -205,7 +205,7 @@ void server_main(int argc, char *port)
 		//printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		/* Check if we have sockets/STDIN to process */
 		if(selret > 0){
-		    //cout<<"OK\n";
+		    ////cout<<"OK\n";
 			/* Loop through socket descriptors to check which ones are ready */
 			for(sock_index=0; sock_index<=head_socket; sock_index+=1){
 				
@@ -219,14 +219,14 @@ void server_main(int argc, char *port)
 						if(fgets(cmd, CMD_SIZE-1, stdin) == NULL) //Mind the newline character that will be written to cmd
 							exit(-1);
 						
-						printf("\nServer  got the message : %s\n", cmd);
+						//printf("\nServer  got the message : %s\n", cmd);
 
 						string str_cmd = string(cmd);
 						//str_cmd = str_cmd.substr(0, str_cmd.size()-1);
 
 						vector<string> command_vec;
                         command_vec = get_vector_string(str_cmd);
-						//cout<<str_cmd<<"  "<<str_cmd.size()<<"\n";
+						////cout<<str_cmd<<"  "<<str_cmd.size()<<"\n";
 
 						if(command_vec[0] == "AUTHOR") {
                             cse4589_print_and_log("[AUTHOR:SUCCESS]\n");
@@ -238,13 +238,13 @@ void server_main(int argc, char *port)
 
 						else if(command_vec[0]  == "IP") {
 						    string ip = get_ip();
-        	                //cout<<"Ip address from my server code = "<<ip<<"\n";
+        	                ////cout<<"Ip address from my server code = "<<ip<<"\n";
         	                cse4589_print_and_log("[IP:SUCCESS]\n");
                             cse4589_print_and_log("IP:%s\n", ip.c_str());
                             cse4589_print_and_log("[IP:END]\n");
 						}
 						else if(command_vec[0]  == "PORT") {
-        	                //cout<<"Port number from my server code = "<<port<<"\n";
+        	                ////cout<<"Port number from my server code = "<<port<<"\n";
                             cse4589_print_and_log("[PORT:SUCCESS]\n");
                             cse4589_print_and_log("PORT:%s\n", port);
                             cse4589_print_and_log("[PORT:END]\n");
@@ -253,11 +253,11 @@ void server_main(int argc, char *port)
 						    // Need to be implemented
 						    cse4589_print_and_log("[LIST:SUCCESS]\n");
 
-						    sort(client_list.begin(), client_list.end(), compare);
+						    sort(client_list.begin(), client_list.end(), compare_port);
 
 						    for(int i = 0 ; i < client_list.size(); i++) {
 						        client_info cur = client_list[i];
-						        //cout<<cur.IP<<"\n";
+						        ////cout<<cur.IP<<"\n";
                                 cse4589_print_and_log("%-5d%-35s%-20s%-8d\n", i+1, cur.host_name.c_str(), cur.IP.c_str(), atoi(cur.PORT.c_str()));
                             }
 
@@ -267,11 +267,11 @@ void server_main(int argc, char *port)
 						    // Need to be implemented
 						    cse4589_print_and_log("[STATISTICS:SUCCESS]\n");
 
-						    sort(client_list.begin(), client_list.end(), compare);
+						    sort(client_list.begin(), client_list.end(), compare_port);
 
 						    for(int i = 0 ; i < client_list.size(); i++) {
 						        client_info cur = client_list[i];
-						        //cout<<cur.IP<<"\n";
+						        ////cout<<cur.IP<<"\n";
 						        cse4589_print_and_log("%-5d%-35s%-8d%-8d%-8s\n", i+1, cur.host_name.c_str(), cur.num_msg_sent, cur.num_msg_rcv, cur.login_status.c_str());
 						    }
 
@@ -307,7 +307,7 @@ void server_main(int argc, char *port)
 						if(fdaccept < 0)
 							perror("Accept failed.");
 						
-						printf("\nRemote Host connected!\n");
+						//printf("\nRemote Host connected!\n");
 
 						/* Add to watched socket list */
 						FD_SET(fdaccept, &master_list);
@@ -321,7 +321,7 @@ void server_main(int argc, char *port)
 						
 						if(recv(sock_index, buffer, BUFFER_SIZE, 0) <= 0){
 							close(sock_index);
-							printf("Remote Host terminated connection!\n");
+							//printf("Remote Host terminated connection!\n");
 							
 							/* Remove from watched list */
 							FD_CLR(sock_index, &master_list);
@@ -329,19 +329,19 @@ void server_main(int argc, char *port)
 						else {
 							//Process incoming data from existing clients here ...
 
-							//cout<<"Enter else case\n";
+							////cout<<"Enter else case\n";
 
                             ///*
                             vector<string> command_vec;
 
                             string buffer_str = string(buffer);
 
-                            cout<<"Client sent to me BUFFER string ====  "<<buffer_str<<"\n";
+                            //cout<<"Client sent to me BUFFER string ====  "<<buffer_str<<"\n";
 
                             command_vec = get_vector_string(buffer);
                             //if (command_vec[0] == "LOGIN") {
 
-                            cout<< command_vec[0]<<"\n";
+                            //cout<< command_vec[0]<<"\n";
                             if (command_vec[0] == "LOGIN") {
                                  string client_ip = command_vec[1];
                                  string client_port = command_vec[2];
@@ -356,9 +356,9 @@ void server_main(int argc, char *port)
 								char client_data[2048];
 
 								for(int i = 0 ; i < client_list.size(); i++) {
-									//cout<<"Inside For";
+									////cout<<"Inside For";
 						        	if(client_list[i].login_status =="logged-in"){
-										//cout<<"Inside If";
+										////cout<<"Inside If";
 										strcat(client_data, client_list[i].host_name.c_str());
 										strcat(client_data," ");
 										strcat(client_data, client_list[i].IP.c_str());
@@ -378,11 +378,14 @@ void server_main(int argc, char *port)
                                      }
                                 }
 
-								cout<<"Client list in server \n"<<send_list_to_client<<"\n";
+								//cout<<"Client list in server \n"<<send_list_to_client<<"\n";
 								char* client_list_data = (char*) send_list_to_client.c_str();
 
+								int success = 0;
+
 								if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
-                                     printf("Done SENDING THE  LIST!\n");
+                                     //printf("Done SENDING THE  LIST!\n");
+                                     success = 1;
                                  fflush(stdout);
 
 
@@ -411,15 +414,16 @@ void server_main(int argc, char *port)
 
                                     if(send_buffer_msg_to_client.size()>0)
                                     if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
-                                         printf("Sending msg from Buffer done-->> %s\n", client_list_data);
+                                         //printf("Sending msg from Buffer done-->> %s\n", client_list_data);
+                                         success = 1;
 
                                 }
 
-								//cout<<client_data;
+								////cout<<client_data;
                             }
 
                             else if (command_vec[0] == "SEND") {
-                                cout<<"destination IP in server =  "<<command_vec[1]<< "  "<<command_vec[2]<<" "<<command_vec[3]<<"\n";
+                                //cout<<"destination IP in server =  "<<command_vec[1]<< "  "<<command_vec[2]<<" "<<command_vec[3]<<"\n";
                                 client_info dest_client = get_client_info(command_vec[2]);
 
                                 string sender_client = command_vec[1];
@@ -429,16 +433,16 @@ void server_main(int argc, char *port)
 								int block_flag = 0;
 
 
-                                if(dest_client.IP == "None") cout<<"Destination IP not in the list\n";
+                                if(dest_client.IP == "None") //cout<<"Destination IP not in the list\n";
                                     else {
-									    cout<<"Dest IP found\n";
+									    //cout<<"Dest IP found\n";
 									    //Logic to check if destination client is blocked
 									    struct client_info destination = get_client_info(receiver_client);
 									    vector<block_info>::iterator b;
 									    for (b = destination.blocked_list.begin(); b!=destination.blocked_list.end(); ++b){
 										    if(b->blocked_ip == sender_client){
 											    block_flag = 1;
-											    //cout<<"Blocked found\n";
+											    ////cout<<"Blocked found\n";
 										    }
 									    }
 									    if(block_flag == 0){
@@ -450,7 +454,7 @@ void server_main(int argc, char *port)
 									    }
 									
                                         if(dest_client.login_status == "logged-out") {
-                                            cout<<"Client logged out\n";
+                                            //cout<<"Client logged out\n";
                                             for(int i = 0 ; i < client_list.size(); i++) {
                                                 client_info cur = client_list[i];
                                                     if (receiver_client != cur.IP) continue;
@@ -489,8 +493,8 @@ void server_main(int argc, char *port)
 
                             else if (command_vec[0] == "BROADCAST") {
                                  // Need to be implemented
-                                 cout<<"command_vector[1] is "<<command_vec[1]<<"\n";
-                                 cout<<"command_vector[2] is "<<command_vec[2]<<"\n";
+                                 //cout<<"command_vector[1] is "<<command_vec[1]<<"\n";
+                                 //cout<<"command_vector[2] is "<<command_vec[2]<<"\n";
                                  string sender_ip = command_vec[1];
                                  string broadcast_message = command_vec[2];
 
@@ -546,7 +550,7 @@ void server_main(int argc, char *port)
                                  // Need to be implemented
                                  string sender_ip = command_vec[1];
 
-                                 //cout<<"In block server "<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
+                                 ////cout<<"In block server "<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
 
                                  string blocked_ip = command_vec[2];
                                  string blocked_port = command_vec[3];
@@ -563,7 +567,7 @@ void server_main(int argc, char *port)
                                      block_dest.blocked_port = blocked_port;
                                      client_list[i].blocked_list.push_back(block_dest);
 
-                                     //cout<<"In blocked  "<< block_dest.blocked_ip <<" "<<block_dest.blocked_host_name<<" "<<block_dest.blocked_port<<"\n";
+                                     ////cout<<"In blocked  "<< block_dest.blocked_ip <<" "<<block_dest.blocked_host_name<<" "<<block_dest.blocked_port<<"\n";
                                  }
                              }
 
@@ -572,7 +576,7 @@ void server_main(int argc, char *port)
 
                                  string sender_ip = command_vec[1];
 
-                                 //cout<<"In Unblock block"<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
+                                 ////cout<<"In Unblock block"<<command_vec[0]<<" "<<command_vec[1]<<" "<<command_vec[2]<<"\n";
 
                                  string blocked_ip = command_vec[2];
                                  string blocked_port = command_vec[3];
@@ -591,12 +595,12 @@ void server_main(int argc, char *port)
 
                                      int block_found = 0;
                                      int cnt = 0;
-                                     //cout<<"Before size === "<<client_list[i].blocked_list.size()<<"\n";
+                                     ////cout<<"Before size === "<<client_list[i].blocked_list.size()<<"\n";
                                      for(int j =0; j< client_list[i].blocked_list.size(); j++){
                                         struct block_info block_dest = client_list[i].blocked_list[j];
                                         if(block_dest.blocked_ip == blocked_ip){
                                            block_found = 1;
-                                           //cout<<"Unblocking done\n";
+                                           ////cout<<"Unblocking done\n";
                                            break;
                                         }
                                         cnt +=1;
@@ -604,7 +608,7 @@ void server_main(int argc, char *port)
                                      if (block_found == 1){
                                         client_list[i].blocked_list.erase(client_list[i].blocked_list.begin() + cnt);
                                         //int sz = client_list[i].blocked_list.size();
-                                        //cout<<"In Unblocked done  "<<sz<<" "<< client_list[i].blocked_list[sz-1].blocked_ip<<" "<<cnt<<"\n";
+                                        ////cout<<"In Unblocked done  "<<sz<<" "<< client_list[i].blocked_list[sz-1].blocked_ip<<" "<<cnt<<"\n";
                                      }
                                  }
                              }

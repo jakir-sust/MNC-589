@@ -57,7 +57,8 @@ using namespace std;
 
 bool compare_port(client_info a, client_info b)
 {
-    if (a.PORT < b.PORT) return 1;
+
+    if (atoi( a.PORT.c_str() ) < atoi( b.PORT.c_str() )) return 1;
     else return 0;
 }
 vector<string> get_vector_stringc(char* buffer)
@@ -198,7 +199,7 @@ void client_main(int argc, string ip, char *port)
                     if(fgets(msg, MSG_SIZE-1, stdin) == NULL) //Mind the newline character that will be written to msg
                         exit(-1);
 
-                    printf("I got: %s from STDIN \n", msg);
+                   // printf("I got: %s from STDIN \n", msg);
 
 
                     vector<string> command_vec;
@@ -216,8 +217,17 @@ void client_main(int argc, string ip, char *port)
                     }
                     else if (command_vec[0] == "IP") {
                         string ip = get_ip();
-                        cout<<"Ip address from client my code = "<<ip<<"\n";
+                        //cout<<"Ip address from my server code = "<<ip<<"\n";
+                        cse4589_print_and_log("[IP:SUCCESS]\n");
+                        cse4589_print_and_log("IP:%s\n", ip.c_str());
+                        cse4589_print_and_log("[IP:END]\n");
                     }
+                    else if(command_vec[0]  == "PORT") {
+                        //cout<<"Port number from my server code = "<<port<<"\n";
+                        cse4589_print_and_log("[PORT:SUCCESS]\n");
+                        cse4589_print_and_log("PORT:%s\n", port);
+                        cse4589_print_and_log("[PORT:END]\n");
+					}
                     else if (command_vec[0] == "SEND") {
                         //char* added_string = add_two_string((char *)"First",(char *) "Second");
 
@@ -251,7 +261,7 @@ void client_main(int argc, string ip, char *port)
 
                         // cout<<added_string<<"\n";
                         msg = added_string;
-                        cout<<"MESSAGE SENT FROM THE CLIENT IS :"<<msg<<"\n";
+                        //cout<<"MESSAGE SENT FROM THE CLIENT IS :"<<msg<<"\n";
                         if(send(server, msg, strlen(msg), 0) == strlen(msg))
                             cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
                         else
@@ -273,7 +283,7 @@ void client_main(int argc, string ip, char *port)
                         if(fdaccept > head_socket) head_socket = fdaccept;
 
 
-                        printf("\nLOGIN to the remote server... ");
+                        //printf("\nLOGIN to the remote server... ");
 
                         char hostname[1024];
                         hostname[1023] = '\0';
@@ -435,7 +445,7 @@ void client_main(int argc, string ip, char *port)
 
                     if(recv(sock_index, buffer, BUFFER_SIZE, 0) <= 0){
                         close(sock_index);
-                        printf("Remote Host Server terminated connection!\n");
+                        //printf("Remote Host Server terminated connection!\n");
                         /* Remove from watched list */
                         FD_CLR(sock_index, &master_list);
                     }
