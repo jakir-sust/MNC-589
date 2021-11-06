@@ -520,7 +520,10 @@ void server_main(int argc, char *port)
                                  for(int i = 0 ; i < client_list.size(); i++) {
                                         client_info cur = client_list[i];
                                         // if the cur IP is the same as sender move onto the next client
-                                        if(cur.IP == sender_ip) continue;
+                                        if(cur.IP == sender_ip){
+                                            client_list[i].num_msg_sent += 1;
+                                            continue;
+                                        }
 
                                         //Now, Iterate through the blocked list for this client to check if the sender is blocked
                                         vector<block_info>::iterator b;
