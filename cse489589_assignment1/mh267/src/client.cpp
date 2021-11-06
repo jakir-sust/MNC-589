@@ -206,11 +206,18 @@ void client_main(int argc, string ip, char *port)
                     //cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
 
                     if (command_vec[0] == "AUTHOR") {
-                        // Need to be implemented
+                            cse4589_print_and_log("[AUTHOR:SUCCESS]\n");
+                            cse4589_print_and_log("I, mh267, have read and understood the course academic integrity policy.\n");
+							cse4589_print_and_log("I, dyadav2, have read and understood the course academic integrity policy.\n");
+							cse4589_print_and_log("I, balasub5, have read and understood the course academic integrity policy.\n");
+                            cse4589_print_and_log("[AUTHOR:END]\n");
                     }
                     else if (command_vec[0] == "IP") {
-                        string ip = get_ip();
-                        cout<<"Ip address from client my code = "<<ip<<"\n";
+						    string ip = get_ip();
+        	                //cout<<"Ip address from my server code = "<<ip<<"\n";
+        	                cse4589_print_and_log("[IP:SUCCESS]\n");
+                            cse4589_print_and_log("IP:%s\n", ip.c_str());
+                            cse4589_print_and_log("[IP:END]\n");
                     }
                     else if (command_vec[0] == "SEND") {
                         //char* added_string = add_two_string((char *)"First",(char *) "Second");
