@@ -434,6 +434,7 @@ void client_main(int argc, string ip, char *port)
                         cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
 
                         fflush(stdout);
+                        exit(0);
                     }
                 }
 
