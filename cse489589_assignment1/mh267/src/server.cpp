@@ -376,13 +376,13 @@ void server_main(int argc, char *port)
                                         send_list_to_client += cur.PORT + " ";
                                         send_list_to_client += cur.host_name + "\n";
                                      }
-                                 }
+                                }
 
 								cout<<"Client list in server \n"<<send_list_to_client<<"\n";
 								char* client_list_data = (char*) send_list_to_client.c_str();
 
 								if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
-                                     printf("Done SENDING THE DAMN LIST!\n");
+                                     printf("Done SENDING THE  LIST!\n");
                                  fflush(stdout);
 
 
@@ -413,7 +413,7 @@ void server_main(int argc, char *port)
                                     if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
                                          printf("Sending msg from Buffer done-->> %s\n", client_list_data);
 
-                                 }
+                                }
 
 								//cout<<client_data;
                             }
@@ -430,56 +430,56 @@ void server_main(int argc, char *port)
 
 
                                 if(dest_client.IP == "None") cout<<"Destination IP not in the list\n";
-                                else {
-									cout<<"Dest IP found\n";
-									//Logic to check if destination client is blocked
-									struct client_info destination = get_client_info(receiver_client);
-									vector<block_info>::iterator b;
-									for (b = destination.blocked_list.begin(); b!=destination.blocked_list.end(); ++b){
-										if(b->blocked_ip == sender_client){
-											block_flag = 1;
-											//cout<<"Blocked found\n";
-										}
-									}
-									if(block_flag == 0){
-										//Logic for updating STATS for Sending Client
-									for(int i = 0 ; i < client_list.size(); i++) {
-										if(client_list[i].IP == sender_client){
-											client_list[i].num_msg_sent += 1;
-										}
-									}
-									
-                                    if(dest_client.login_status == "logged-out") {
-                                        cout<<"Client logged out\n";
-                                        for(int i = 0 ; i < client_list.size(); i++) {
-                                            client_info cur = client_list[i];
-                                            if (receiver_client != cur.IP) continue;
-                                            struct buffer_info buffer_msg;
-                                            buffer_msg.sender_ip = sender_client;
-                                            buffer_msg.sender_msg = sender_msg;
-
-                                            client_list[i].buffer_msg.push(buffer_msg);
-
-                                        }
-                                    }
                                     else {
-                                        string msg_client = "EVENT " + sender_client + " " + sender_msg;
-                                        char * msg_to_client = (char*) msg_client.c_str();
-                                        if(send(dest_client.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
-                                            //printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
-                                            cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
-                                            cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_client.c_str(), receiver_client.c_str(), sender_msg.c_str());
-                                            cse4589_print_and_log("[%s:END]\n", "RELAYED");
-                                        }
-										//Logic for updating STATS for Receiving Client
-										for(int i = 0 ; i < client_list.size(); i++) {
-											if(client_list[i].IP == receiver_client){
-												client_list[i].num_msg_rcv += 1;
-											}
-										}
-									}
+									    cout<<"Dest IP found\n";
+									    //Logic to check if destination client is blocked
+									    struct client_info destination = get_client_info(receiver_client);
+									    vector<block_info>::iterator b;
+									    for (b = destination.blocked_list.begin(); b!=destination.blocked_list.end(); ++b){
+										    if(b->blocked_ip == sender_client){
+											    block_flag = 1;
+											    //cout<<"Blocked found\n";
+										    }
+									    }
+									    if(block_flag == 0){
+										    //Logic for updating STATS for Sending Client
+									        for(int i = 0 ; i < client_list.size(); i++) {
+										        if(client_list[i].IP == sender_client){
+											    client_list[i].num_msg_sent += 1;
+										    }
+									    }
+									
+                                        if(dest_client.login_status == "logged-out") {
+                                            cout<<"Client logged out\n";
+                                            for(int i = 0 ; i < client_list.size(); i++) {
+                                                client_info cur = client_list[i];
+                                                    if (receiver_client != cur.IP) continue;
+                                                struct buffer_info buffer_msg;
+                                                buffer_msg.sender_ip = sender_client;
+                                                buffer_msg.sender_msg = sender_msg;
 
-									}
+                                                client_list[i].buffer_msg.push(buffer_msg);
+
+                                            }
+                                        }
+                                        else {
+                                            string msg_client = "EVENT " + sender_client + " " + sender_msg;
+                                            char * msg_to_client = (char*) msg_client.c_str();
+                                            if(send(dest_client.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
+                                                //printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
+                                                cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                                cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_client.c_str(), receiver_client.c_str(), sender_msg.c_str());
+                                                cse4589_print_and_log("[%s:END]\n", "RELAYED");
+                                            }
+										    //Logic for updating STATS for Receiving Client
+										    for(int i = 0 ; i < client_list.size(); i++) {
+											    if(client_list[i].IP == receiver_client){
+												    client_list[i].num_msg_rcv += 1;
+											    }
+										    }
+									    }
+
+                                    }
 									
                                     
 
@@ -487,9 +487,61 @@ void server_main(int argc, char *port)
 
                             }
 
-                             else if (command_vec[0] == "BROADCAST") {
+                            else if (command_vec[0] == "BROADCAST") {
                                  // Need to be implemented
-                             }
+                                 cout<<"command_vector[1] is "<<command_vec[1]<<"\n";
+                                 cout<<"command_vector[2] is "<<command_vec[2]<<"\n";
+                                 string sender_ip = command_vec[1];
+                                 string broadcast_message = command_vec[2];
+
+                                 //Increment message send stats for sender
+									for(int i = 0 ; i < client_list.size(); i++) {
+										if(client_list[i].IP == sender_ip){
+											client_list[i].num_msg_sent += 1;
+										}
+									}
+
+
+                                 //Iterate through the client list to send broadcast message
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+                                        client_info cur = client_list[i];
+                                        // if the cur IP is the same as sender move onto the next client
+                                        if(cur.IP == sender_ip) continue;
+
+                                        //Now, Iterate through the blocked list for this client to check if the sender is blocked
+                                        vector<block_info>::iterator b;
+                                        int isSenderBlocked = 0;
+									    for (b = cur.blocked_list.begin(); b!=cur.blocked_list.end(); ++b){
+										    if(b->blocked_ip == sender_ip){
+											    isSenderBlocked = 1;
+										    }
+									    }
+                                        // if the sender is not blocked send the message or add it to buffer is the destination client is logged out
+                                        if(isSenderBlocked==0){
+                                            if(cur.login_status == "logged-in"){
+                                                string msg_client = "EVENT " + sender_ip + " " + broadcast_message;
+                                                char * msg_to_client = (char*) msg_client.c_str();
+                                                if(send(cur.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
+                                                    cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                                    cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_ip.c_str(), cur.IP.c_str(), broadcast_message.c_str());
+                                                    cse4589_print_and_log("[%s:END]\n", "RELAYED");
+                                                }
+										        //Logic for updating STATS for Receiving Client
+											    cur.num_msg_rcv += 1;
+										    }
+
+                                            //if the client is logged out, push it in buffer
+                                            else if (cur.login_status == "logged-out"){
+                                                struct buffer_info buffer_msg;
+                                                buffer_msg.sender_ip = sender_ip;
+                                                buffer_msg.sender_msg = broadcast_message;
+                                                client_list[i].buffer_msg.push(buffer_msg);
+
+                                            }
+                                        }
+
+                                    }
+                                }
                              else if (command_vec[0] == "BLOCK") {
                                  // Need to be implemented
                                  string sender_ip = command_vec[1];
