@@ -66,9 +66,11 @@ vector<string> get_vector_stringc(char* buffer)
     return command_vec;
 }
 
-bool compare_port(client_info a, client_info b)
+
+bool compare(client_info a, client_info b)
 {
-    if (a.PORT < b.PORT) return 1;
+
+    if (std::stoi(a.PORT) < std::stoi(b.PORT)) return 1;
     else return 0;
 }
 vector<string> split_string(string buffer, string delimiter){
