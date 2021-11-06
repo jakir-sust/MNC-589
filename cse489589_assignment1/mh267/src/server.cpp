@@ -624,6 +624,26 @@ void server_main(int argc, char *port)
                              }
                              else if (command_vec[0] == "REFRESH") {
                                  // Need to be implemented
+                                 string send_list_to_client = "";
+                                 for(int i = 0 ; i < client_list.size(); i++) {
+                                     if(client_list[i].login_status =="logged-in"){
+                                        client_info cur = client_list[i];
+                                        send_list_to_client += cur.IP + " ";
+                                        send_list_to_client += cur.PORT + " ";
+                                        send_list_to_client += cur.host_name + "\n";
+                                     }
+                                }
+
+								//cout<<"Client list in server \n"<<send_list_to_client<<"\n";
+								char* client_list_data = (char*) send_list_to_client.c_str();
+
+								int success = 0;
+
+								if(send(sock_index, client_list_data, strlen(client_list_data), 0) == strlen(client_list_data))
+                                     //printf("Done SENDING THE  LIST!\n");
+                                     success = 1;
+                                 fflush(stdout);
+                                 
                              }
 
                              else if (command_vec[0] == "LOGOUT") {
@@ -638,6 +658,16 @@ void server_main(int argc, char *port)
 
                              else if (command_vec[0] == "EXIT") {
                                  // Need to be implemented
+                                 client_info client = get_client_info(command_vec[1]);
+                                 if(client.login_status == "logged-in"){
+                                    for(int i = 0 ; i < client_list.size(); i++) {
+                                        if(client.IP == client_list[i].IP){
+                                            client_list.erase(client_list.begin()+i);
+                                        }
+                                    }
+                                }
+                                 
+
                              }
 
                              //if(send(sock_index, buffer, strlen(buffer), 0) == strlen(buffer))

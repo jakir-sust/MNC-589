@@ -205,7 +205,7 @@ void client_main(int argc, string ip, char *port)
                     vector<string> command_vec;
                     command_vec = get_vector_stringc(msg);
 
-                    //cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
+                    cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
 
                     if (command_vec[0] == "AUTHOR") {
                             cse4589_print_and_log("[AUTHOR:SUCCESS]\n");
