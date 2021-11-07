@@ -375,11 +375,35 @@ void client_main(int argc, string ip, char *port)
                         char* first = add_two_string((char*)"BLOCK",(char *)get_ip().c_str());
                         char* second = add_two_string(first,(char *)command_vec[1].c_str());
                         //look for blocked record in client list.
+                        string cur_ip = get_ip();
+
+                        int already_blocked = 0;
+
+                        for(int i = 0; i < client_list.size(); i++){
+                            if(client_list[i].IP == cur_ip){
+                                for(int j=0; j <client_list[i].blocked_list.size();j++){
+                                    struct block_info temp_block_info= client_list[i].blocked_list[j];
+                                    if(temp_block_info.blocked_ip == command_vec[1]) {
+                                        already_blocked = 1;
+                                    }
+                                }
+                            }
+                        }
+
+                        if(already_blocked){
+                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                             cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+                             continue;
+                        }
+
                         int success = 0;
                         for(int i = 0; i < client_list.size(); i++){
                             if(client_list.at(i).IP.compare(command_vec[1]) == 0){
                                 char * msg = add_two_string(second,(char*) client_list.at(i).PORT.c_str());
-                                //send 
+                                //send
+                                struct block_info temp_block_info;
+                                temp_block_info.blocked_ip = command_vec[1];
+                                client_list[i].blocked_list.push_back(temp_block_info);
 
                                 if(send(server, msg, strlen(msg), 0) == strlen(msg))
                                     success = 1;
@@ -391,11 +415,33 @@ void client_main(int argc, string ip, char *port)
                             cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
                         cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
                     }
+
                     else if (command_vec[0] == "UNBLOCK") {
                         // Need to be implemented
                         char* first = add_two_string((char*)"UNBLOCK",(char *)get_ip().c_str());
                         char* second = add_two_string(first,(char *)command_vec[1].c_str());
                         //look for blocked record in client list.
+                        string cur_ip = get_ip();
+                        int already_unblocked = 1;
+
+                        for(int i = 0; i < client_list.size(); i++){
+                            if(client_list[i].IP == cur_ip){
+                                for(int j=0; j <client_list[i].blocked_list.size();j++){
+                                    struct block_info temp_block_info= client_list[i].blocked_list[j];
+                                    if(temp_block_info.blocked_ip == command_vec[1]) {
+                                        client_list[i].blocked_list.erase(client_list[i].blocked_list.begin() + j);
+                                        already_unblocked = 0;
+                                    }
+                                }
+                            }
+                        }
+
+                        if(already_unblocked){
+                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                             cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+                             continue;
+                        }
+
                         int success = 0;
                         for(int i = 0; i < client_list.size(); i++){
                             if(client_list.at(i).IP.compare(command_vec[1]) == 0){

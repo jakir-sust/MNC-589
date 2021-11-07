@@ -287,9 +287,13 @@ void server_main(int argc, char *port)
 						else if(command_vec[0]  == "BLOCKED") {
 						    // Need to be implemented
 						    string blocker_ip = command_vec[1];
+
+						    int is_exist = 0;
+
 						    for(int i = 0 ; i < client_list.size(); i++) {
                                 client_info cur = client_list[i];
                                 if (blocker_ip != cur.IP) continue;
+                                is_exist = 1;
 
                                 sort(cur.blocked_list.begin(), cur.blocked_list.end(), compare_blocked_ports);
                                 cse4589_print_and_log("[BLOCKED:SUCCESS]\n");
@@ -301,6 +305,11 @@ void server_main(int argc, char *port)
                                 }
                                 cse4589_print_and_log("[BLOCKED:END]\n");
 
+						    }
+
+						    if(is_exist == 0) {
+                                cse4589_print_and_log("[%s:ERROR]\n","BLOCKED");
+                                cse4589_print_and_log("[%s:END]\n","BLOCKED");
 						    }
                         }
 						
