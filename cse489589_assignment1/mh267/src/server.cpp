@@ -515,6 +515,9 @@ void server_main(int argc, char *port)
 										}
 									}
 
+                                 cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                 cse4589_print_and_log("msg from:%s, to:255.255.255.255\n[msg]:%s\n",sender_ip.c_str() , broadcast_message.c_str());
+                                 cse4589_print_and_log("[%s:END]\n", "RELAYED");
 
                                  //Iterate through the client list to send broadcast message
                                  for(int i = 0 ; i < client_list.size(); i++) {
@@ -528,21 +531,16 @@ void server_main(int argc, char *port)
                                         //Now, Iterate through the blocked list for this client to check if the sender is blocked
                                         vector<block_info>::iterator b;
                                         int isSenderBlocked = 0;
-									    for (b = cur.blocked_list.begin(); b!=cur.blocked_list.end(); ++b){
-										    if(b->blocked_ip == sender_ip){
-											    isSenderBlocked = 1;
-										    }
-									    }
-									    cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
-									    cse4589_print_and_log("msg from:%s, to:255.255.255.255\n[msg]:%s\n",sender_ip.c_str() , broadcast_message.c_str());
-                                        cse4589_print_and_log("[%s:END]\n", "RELAYED");
+
                                         // if the sender is not blocked send the message or add it to buffer is the destination client is logged out
                                         if(isSenderBlocked==0){
                                             if(cur.login_status == "logged-in"){
                                                 string msg_client = "EVENT " + sender_ip + " " + broadcast_message;
                                                 char * msg_to_client = (char*) msg_client.c_str();
-                                                if(send(cur.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
+                                                if(send(cur.fd, msg_to_client, strlen(msg_to_client), 0) != strlen(msg_to_client)) {
                                                    // do nothing
+                                                    cse4589_print_and_log("[%s:ERROR]\n", "BROADCAST");
+                                                    cse4589_print_and_log("[%s:END]\n", "BROADCAST");
                                                 }
 										        //Logic for updating STATS for Receiving Client
 											    cur.num_msg_rcv += 1;
