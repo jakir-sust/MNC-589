@@ -533,15 +533,16 @@ void server_main(int argc, char *port)
 											    isSenderBlocked = 1;
 										    }
 									    }
+									    cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+									    cse4589_print_and_log("msg from:%s, to:255.255.255.255\n[msg]:%s\n",sender_ip.c_str() , broadcast_message.c_str());
+                                        cse4589_print_and_log("[%s:END]\n", "RELAYED");
                                         // if the sender is not blocked send the message or add it to buffer is the destination client is logged out
                                         if(isSenderBlocked==0){
                                             if(cur.login_status == "logged-in"){
                                                 string msg_client = "EVENT " + sender_ip + " " + broadcast_message;
                                                 char * msg_to_client = (char*) msg_client.c_str();
                                                 if(send(cur.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
-                                                    cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
-                                                    cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_ip.c_str(), cur.IP.c_str(), broadcast_message.c_str());
-                                                    cse4589_print_and_log("[%s:END]\n", "RELAYED");
+                                                   // do nothing
                                                 }
 										        //Logic for updating STATS for Receiving Client
 											    cur.num_msg_rcv += 1;
@@ -553,7 +554,6 @@ void server_main(int argc, char *port)
                                                 buffer_msg.sender_ip = sender_ip;
                                                 buffer_msg.sender_msg = broadcast_message;
                                                 client_list[i].buffer_msg.push(buffer_msg);
-
                                             }
                                         }
 
