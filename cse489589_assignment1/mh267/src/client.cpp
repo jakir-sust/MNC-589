@@ -398,7 +398,7 @@ void client_main(int argc, string ip, char *port)
                             }
                         }
 
-                        if(already_blocked){
+                        if(already_blocked == 1 || isValidIP(command_vec[1]) == 0){
                              cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
                              cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
                              continue;
