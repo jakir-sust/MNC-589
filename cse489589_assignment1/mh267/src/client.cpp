@@ -241,7 +241,16 @@ void client_main(int argc, string ip, char *port)
                         // cout<<added_string<<"\n";
                         msg = added_string;
 
-                        if(send(server, msg, strlen(msg), 0) == strlen(msg))
+                        int is_exist = 0;
+
+                        for (int j=0; j< client_list.size();j++){
+                            if(client_list[j].IP == command_vec[1]) {
+                                is_exist = 1;
+                                break;
+                            }
+                        }
+
+                        if(is_exist && send(server, msg, strlen(msg), 0) == strlen(msg))
                             cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
                         else
                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
