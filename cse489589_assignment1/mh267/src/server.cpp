@@ -420,10 +420,10 @@ void server_main(int argc, char *port)
                                         send_buffer_msg_to_client += cur_buf_msg.sender_ip + " ";
                                         send_buffer_msg_to_client += cur_buf_msg.sender_msg + " ";
 
-                                        cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
-                                        cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", cur_buf_msg.sender_ip.c_str(),
-                                                                client_ip.c_str(), cur_buf_msg.sender_msg.c_str());
-                                        cse4589_print_and_log("[%s:END]\n", "RELAYED");
+                                        //cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                        //cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", cur_buf_msg.sender_ip.c_str(),
+                                        //                        client_ip.c_str(), cur_buf_msg.sender_msg.c_str());
+                                        //cse4589_print_and_log("[%s:END]\n", "RELAYED");
 										client_list[i].num_msg_rcv += 1;
 
                                     }
@@ -434,6 +434,13 @@ void server_main(int argc, char *port)
                                          //printf("Sending msg from Buffer done-->> %s\n", client_list_data);
                                          success = 1;
 
+                                }
+
+                                string msg_client = "EVENT_DONE";
+                                char * msg_to_client = (char*) msg_client.c_str();
+                                if(send(sock_index, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
+                                    //printf("Sending to client login done\n");
+                                    // send dummy
                                 }
 
 								////cout<<client_data;

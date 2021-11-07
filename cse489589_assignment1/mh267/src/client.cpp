@@ -306,17 +306,23 @@ void client_main(int argc, string ip, char *port)
                             char* added_string = add_two_string(first2, port);
                             msg = add_two_string(added_string, hostname);
 
-                            if(send(server, msg, strlen(msg), 0) == strlen(msg))
-                                cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
-                            else
+                            if(send(server, msg, strlen(msg), 0) == strlen(msg)){
+                             ////cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                            }
+                            else{
                                 cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
-                            cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+                                cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+                                continue;
+                            }
+
 
                             fflush(stdout);
 
                             /* Initialize buffer to receieve response */
                             char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
                             memset(buffer, '\0', BUFFER_SIZE);
+
+                            client_list.clear();
 
                             if(recv(server, buffer, BUFFER_SIZE, 0) >= 0){//process table
                                 // printf("Server responded: %s\n\n", buffer);
@@ -528,6 +534,13 @@ void client_main(int argc, string ip, char *port)
                             }
 
                         }
+
+                        if (command_vec[0] == "EVENT_DONE"){
+                            cse4589_print_and_log("[%s:SUCCESS]\n", "LOGIN");
+                            cse4589_print_and_log("[%s:END]\n", "LOGIN");
+                        }
+
+
 
                     }
                 }
