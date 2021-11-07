@@ -144,9 +144,9 @@ void client_main(int argc, string ip, char *port)
 
 	/* Set up hints structure */
 	memset(&hints, 0, sizeof(hints));
-    	hints.ai_family = AF_INET;
-    	hints.ai_socktype = SOCK_STREAM;
-    	hints.ai_flags = AI_PASSIVE;
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
 
 	/* Fill up address structures */
 	if (getaddrinfo(NULL, port, &hints, &res) != 0)
@@ -205,7 +205,7 @@ void client_main(int argc, string ip, char *port)
                     vector<string> command_vec;
                     command_vec = get_vector_stringc(msg);
 
-                    cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
+                    //cout<<"In client-->>>   "<<command_vec[0]<<"  "<<command_vec[0].size()<<"\n";
 
                     if (command_vec[0] == "AUTHOR") {
                             cse4589_print_and_log("[AUTHOR:SUCCESS]\n");
@@ -282,51 +282,59 @@ void client_main(int argc, string ip, char *port)
 
                     else if (command_vec[0] == "LOGIN") {
 
-                        server = connect_to_host((char *)&command_vec[1][0], (char *)&command_vec[2][0]);
-                        fdaccept = server;
-                        if(fdaccept < 0) perror("Accept failed.");
-                        //printf("\nRemote Host connected!\n");
+                        if(isValidIP(command_vec[1])==1 && isValidPort(command_vec[2]) == 1){
+                            server = connect_to_host((char *)&command_vec[1][0], (char *)&command_vec[2][0]);
+                            fdaccept = server;
+                            if(fdaccept < 0) perror("Accept failed.");
+                                //printf("\nRemote Host connected!\n");
 
-                        /* Add to watched socket list */
-                        FD_SET(fdaccept, &master_list);
-                        if(fdaccept > head_socket) head_socket = fdaccept;
+                            /* Add to watched socket list */
+                            FD_SET(fdaccept, &master_list);
+                            if(fdaccept > head_socket) head_socket = fdaccept;
 
 
-                        //printf("\nLOGIN to the remote server... ");
+                            //printf("\nLOGIN to the remote server... ");
 
-                        char hostname[1024];
-                        hostname[1023] = '\0';
-                        gethostname(hostname, 1023);
+                            char hostname[1024];
+                            hostname[1023] = '\0';
+                            gethostname(hostname, 1023);
 
-                        //cout<<"HOSTNAME --- .>>>   "<<hostname<<"\n";
+                            //cout<<"HOSTNAME --- .>>>   "<<hostname<<"\n";
 
-                        string cur_ip = get_ip();
-                        char *first2 = add_two_string((char *)"LOGIN", (char *) cur_ip.c_str());
-                        char* added_string = add_two_string(first2, port);
-                        msg = add_two_string(added_string, hostname);
+                            string cur_ip = get_ip();
+                            char *first2 = add_two_string((char *)"LOGIN", (char *) cur_ip.c_str());
+                            char* added_string = add_two_string(first2, port);
+                            msg = add_two_string(added_string, hostname);
 
-                        if(send(server, msg, strlen(msg), 0) == strlen(msg))
-                            cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
-                        else
-                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
-                        cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+                            if(send(server, msg, strlen(msg), 0) == strlen(msg))
+                                cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
+                            else
+                                cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                            cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
 
-                        fflush(stdout);
-
-                        /* Initialize buffer to receieve response */
-                        char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
-                        memset(buffer, '\0', BUFFER_SIZE);
-
-                        if(recv(server, buffer, BUFFER_SIZE, 0) >= 0){//process table
-                          // printf("Server responded: %s\n\n", buffer);
-                           string temp = string(buffer);
-                           vector<string> tuples = split_string(temp,"\n");
-                           //printf("Server responded: 1  %d\n\n", tuples.size());
-                           for(int i =0; i < tuples.size() - 1; i++){
-                               struct client_info c = parse_tuple(tuples.at(i));
-                               client_list.push_back(c);
-                           }
                             fflush(stdout);
+
+                            /* Initialize buffer to receieve response */
+                            char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
+                            memset(buffer, '\0', BUFFER_SIZE);
+
+                            if(recv(server, buffer, BUFFER_SIZE, 0) >= 0){//process table
+                                // printf("Server responded: %s\n\n", buffer);
+                                string temp = string(buffer);
+                                vector<string> tuples = split_string(temp,"\n");
+                                //printf("Server responded: 1  %d\n\n", tuples.size());
+                                for(int i=0; i < tuples.size() - 1; i++){
+                                    struct client_info c = parse_tuple(tuples.at(i));
+                                client_list.push_back(c);
+                            }
+                            fflush(stdout);
+                        } 
+
+                    }
+                    else {
+                            cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
+                            cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
+                            continue;
                         }
 
                     }
