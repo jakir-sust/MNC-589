@@ -292,14 +292,14 @@ void server_main(int argc, char *port)
                                 if (blocker_ip != cur.IP) continue;
 
                                 sort(cur.blocked_list.begin(), cur.blocked_list.end(), compare_blocked_ports);
+                                cse4589_print_and_log("[BLOCKED:SUCCESS]\n");
                                 for (int j =0 ; j<cur.blocked_list.size(); j++) {
                                     struct block_info block_dest;
                                     block_dest = cur.blocked_list[j];
-                                    cse4589_print_and_log("[BLOCKED:SUCCESS]\n");
                                     cse4589_print_and_log("%-5d%-35s%-20s%-8d\n",j+1, block_dest.blocked_host_name.c_str(),
                                                             block_dest.blocked_ip.c_str(), atoi(block_dest.blocked_port.c_str()));
-                                    cse4589_print_and_log("[BLOCKED:END]\n");
                                 }
+                                cse4589_print_and_log("[BLOCKED:END]\n");
 
 						    }
                         }
