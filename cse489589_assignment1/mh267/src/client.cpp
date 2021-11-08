@@ -136,6 +136,7 @@ void client_main(int argc, string ip, char *port)
 
 	int server;
     vector<struct client_info> client_list;
+    int logout = 1;
 	int server_socket, head_socket;
 	int fdaccept=0;
 	struct sockaddr_in client_addr;
@@ -232,6 +233,7 @@ void client_main(int argc, string ip, char *port)
                     else if (command_vec[0] == "SEND") {
                         //char* added_string = add_two_string((char *)"First",(char *) "Second");
 
+                        if(logout) continue;
                         string whole_msg = "";
 
                         for (int i = 2; i<command_vec.size(); i++) {
@@ -299,6 +301,8 @@ void client_main(int argc, string ip, char *port)
                     }
 
                     else if (command_vec[0] == "LOGIN") {
+
+                        logout = 0;
 
                         if(isValidIP(command_vec[1])==1 && isValidPort(command_vec[2]) == 1){
                             server = connect_to_host((char *)&command_vec[1][0], (char *)&command_vec[2][0]);
@@ -490,6 +494,7 @@ void client_main(int argc, string ip, char *port)
                         cse4589_print_and_log("[%s:END]\n", command_vec[0].c_str());
                     }
                     else if (command_vec[0] == "LOGOUT") {
+                        logout = 1;
                         string cur_ip = get_ip();
                         char *added_string = add_two_string((char *)"LOGOUT", (char *) cur_ip.c_str());
                         msg = added_string;
@@ -567,9 +572,30 @@ void client_main(int argc, string ip, char *port)
                                 //cout<<"MSG and len in client receiving -->>>> "<<whole_msg <<" "<<whole_msg.size();
                                 string sender_ip = command_vec[cur_event_pos+1];
 
-                                cse4589_print_and_log("[%s:SUCCESS]\n", "RECEIVED");
-                                cse4589_print_and_log("msg from:%s\n[msg]:%s\n", sender_ip.c_str(), sender_msg.c_str());
-                                cse4589_print_and_log("[%s:END]\n", "RECEIVED");
+                                int already_blocked = 0;
+                                string cur_ip = get_ip();
+
+                                for(int i = 0; i < client_list.size(); i++){
+                                    if(client_list[i].IP == cur_ip){
+                                        for(int j=0; j <client_list[i].blocked_list.size();j++){
+                                            struct block_info temp_block_info= client_list[i].blocked_list[j];
+                                            if(temp_block_info.blocked_ip == sender_ip) {
+                                                already_blocked = 1;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //cout<<"already_blocked   --->>>  "<<already_blocked <<" "<<sender_ip<<" "<<sender_msg<<"\n";
+
+                                if(already_blocked == 0) {
+                                //cout<<"Something wromh\n";
+                                    cse4589_print_and_log("[%s:SUCCESS]\n", "RECEIVED");
+                                    cse4589_print_and_log("msg from:%s\n[msg]:%s\n", sender_ip.c_str(), sender_msg.c_str());
+                                    cse4589_print_and_log("[%s:END]\n", "RECEIVED");
+                                }
+                                //cout<<"Something wromh 2\n";
+
 
                             }
 

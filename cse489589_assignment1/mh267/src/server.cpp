@@ -494,6 +494,8 @@ void server_main(int argc, char *port)
                                             ////cout<<"Blocked found\n";
                                         }
                                     }
+                                    if(block_flag) continue;
+
                                     if(block_flag == 0){
                                         //Logic for updating STATS for Sending Client
                                         for(int i = 0 ; i < client_list.size(); i++) {
@@ -506,7 +508,7 @@ void server_main(int argc, char *port)
                                         //cout<<"Client logged out\n";
                                         for(int i = 0 ; i < client_list.size(); i++) {
                                             client_info cur = client_list[i];
-                                                if (receiver_client != cur.IP) continue;
+                                            if (receiver_client != cur.IP) continue;
                                             struct buffer_info buffer_msg;
                                             buffer_msg.sender_ip = sender_client;
                                             buffer_msg.sender_msg = sender_msg;
