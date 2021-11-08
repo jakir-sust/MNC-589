@@ -28,6 +28,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <iostream>
 
 #include <cstring>
 #include <cstdio>
@@ -231,8 +232,25 @@ void client_main(int argc, string ip, char *port)
                     else if (command_vec[0] == "SEND") {
                         //char* added_string = add_two_string((char *)"First",(char *) "Second");
 
+                        string whole_msg = "";
+
+                        for (int i = 2; i<command_vec.size(); i++) {
+                            whole_msg += command_vec[i];
+                            if(i != command_vec.size()-1) {
+                                whole_msg += " ";
+                            }
+                        }
+
+                        if(whole_msg.size()>0 && whole_msg[whole_msg.size()-1] == ' ') {
+                                    whole_msg = whole_msg.substr(0, whole_msg.size()-1);
+                                }
+
+                        //cout<<"MSG and len in client sending -->>>> "<<whole_msg <<" "<<whole_msg.size();
+
+
+
                         string cur_ip = get_ip();
-                        char* dest_msg = &command_vec[2][0];
+                        char* dest_msg = &whole_msg[0];
                         char *first2 = add_two_string((char *)"SEND", (char *) cur_ip.c_str());
                         char *first3 = add_two_string(first2, (char *) &(command_vec[1][0]));
                         char* added_string = add_two_string(first3, dest_msg);
@@ -334,7 +352,7 @@ void client_main(int argc, string ip, char *port)
                                 client_list.push_back(c);
                             }
                             fflush(stdout);
-                        } 
+                        }
 
                     }
                     else {
@@ -460,7 +478,7 @@ void client_main(int argc, string ip, char *port)
                         for(int i = 0; i < client_list.size(); i++){
                             if(client_list.at(i).IP.compare(command_vec[1]) == 0){
                                 char * msg = add_two_string(second,(char*) client_list.at(i).PORT.c_str());
-                                //send 
+                                //send
                                 if(send(server, msg, strlen(msg), 0) == strlen(msg))
                                     success = 1;
                             }
@@ -525,13 +543,37 @@ void client_main(int argc, string ip, char *port)
 
                         if (command_vec[0] == "EVENT") {
 
-                            for (int i=0; i<command_vec.size()-2; i+=3) {
+                            vector<int> event_pos;
+
+                            for(int i=0; i<command_vec.size();i++)
+                                if(command_vec[i] == "EVENT"){
+                                    event_pos.push_back(i);
+                                }
+
+                            string whole_msg = "";
+
+                            for (int i =0 ; i<event_pos.size();i++) {
+                                string sender_msg = "";
+
+                                int cur_event_pos = event_pos[i];
+                                for(int j= cur_event_pos +2; j<command_vec.size();j++){
+                                    if(command_vec[j] == "EVENT") break;
+                                    sender_msg += command_vec[j] +" ";
+                                }
+                                if(sender_msg.size()>0 && sender_msg[sender_msg.size()-1] == ' ') {
+                                    sender_msg = sender_msg.substr(0, sender_msg.size()-1);
+                                }
+
+                                //cout<<"MSG and len in client receiving -->>>> "<<whole_msg <<" "<<whole_msg.size();
+                                string sender_ip = command_vec[cur_event_pos+1];
+
                                 cse4589_print_and_log("[%s:SUCCESS]\n", "RECEIVED");
-                                string sender_ip = command_vec[i+1];
-                                string sender_msg = command_vec[i+2];
                                 cse4589_print_and_log("msg from:%s\n[msg]:%s\n", sender_ip.c_str(), sender_msg.c_str());
                                 cse4589_print_and_log("[%s:END]\n", "RECEIVED");
+
                             }
+
+
 
                         }
 
@@ -556,12 +598,12 @@ int connect_to_host(char *server_ip, char* server_port)
 	int fdsocket;
 	struct addrinfo hints, *res;
 
-	/* Set up hints structure */	
+	/* Set up hints structure */
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 
-	/* Fill up address structures */	
+	/* Fill up address structures */
 	if (getaddrinfo(server_ip, server_port, &hints, &res) != 0)
 		perror("getaddrinfo failed");
 
@@ -569,12 +611,13 @@ int connect_to_host(char *server_ip, char* server_port)
 	fdsocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if(fdsocket < 0)
 		perror("Failed to create socket");
-	
+
 	/* Connect */
 	if(connect(fdsocket, res->ai_addr, res->ai_addrlen) < 0)
 		perror("Connect failed");
-	
+
 	freeaddrinfo(res);
 
 	return fdsocket;
 }
+

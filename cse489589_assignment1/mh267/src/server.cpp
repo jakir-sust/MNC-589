@@ -427,6 +427,11 @@ void server_main(int argc, char *port)
 										client_list[i].num_msg_rcv += 1;
 
                                     }
+
+
+                                    if(send_buffer_msg_to_client.size()>0 && send_buffer_msg_to_client[send_buffer_msg_to_client.size()-1] == ' ') {
+                                        send_buffer_msg_to_client = send_buffer_msg_to_client.substr(0, send_buffer_msg_to_client.size()-1);
+                                    }
                                     char * client_list_data = (char*) send_buffer_msg_to_client.c_str();
 
                                     if(send_buffer_msg_to_client.size()>0)
@@ -450,9 +455,27 @@ void server_main(int argc, char *port)
                                 //cout<<"destination IP in server =  "<<command_vec[1]<< "  "<<command_vec[2]<<" "<<command_vec[3]<<"\n";
                                 client_info dest_client = get_client_info(command_vec[2]);
 
+                                string whole_msg = "";
+
+                                for (int i = 3; i<command_vec.size(); i++) {
+                                    whole_msg += command_vec[i];
+                                    if(i != command_vec.size()-1) {
+                                        whole_msg += " ";
+                                    }
+                                }
+
+                                if(whole_msg.size()>0 && whole_msg[whole_msg.size()-1] == ' ') {
+                                    whole_msg = whole_msg.substr(0, whole_msg.size()-1);
+                                }
+
+                                //cout<<"MSG and len in server -->>>> "<<whole_msg <<" "<<whole_msg.size();
+
                                 string sender_client = command_vec[1];
                                 string receiver_client = command_vec[2];
-                                string sender_msg = command_vec[3];
+                                string sender_msg = whole_msg;
+
+                                //cout<<"Msg in server reached-->>   "<<whole_msg<<"\n";
+
 
 								int block_flag = 0;
 
@@ -523,6 +546,21 @@ void server_main(int argc, char *port)
                                  //cout<<"command_vector[2] is "<<command_vec[2]<<"\n";
                                  string sender_ip = command_vec[1];
                                  string broadcast_message = command_vec[2];
+
+                                 string whole_msg = "";
+
+                                    for (int i = 2; i<command_vec.size(); i++) {
+                                        whole_msg += command_vec[i];
+                                        if(i != command_vec.size()-1) {
+                                            whole_msg += " ";
+                                        }
+                                    }
+
+                                    if(whole_msg.size()>0 && whole_msg[whole_msg.size()-1] == ' ') {
+                                        whole_msg = whole_msg.substr(0, whole_msg.size()-1);
+                                    }
+
+                                   //s broadcast_message =whole_msg;
 
                                  //Increment message send stats for sender
 									for(int i = 0 ; i < client_list.size(); i++) {
@@ -660,7 +698,7 @@ void server_main(int argc, char *port)
                                      //printf("Done SENDING THE  LIST!\n");
                                      success = 1;
                                  fflush(stdout);
-                                 
+
                              }
 
                              else if (command_vec[0] == "LOGOUT") {
@@ -683,7 +721,7 @@ void server_main(int argc, char *port)
                                         }
                                     }
                                 }
-                                 
+
 
                              }
 
@@ -694,13 +732,14 @@ void server_main(int argc, char *port)
 							//printf("\nClient sent me: %s\n", buffer);
 
 						}
-						
+
 						free(buffer);
 					}
 				}
 			}
 		}
 	}
-	
+
 	return ;
 }
+
