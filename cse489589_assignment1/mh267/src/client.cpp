@@ -412,7 +412,7 @@ void client_main(int argc, string ip, char *port)
 
                         int success = 0;
                         for(int i = 0; i < client_list.size(); i++){
-                            if(client_list.at(i).IP.compare(command_vec[1]) == 0){
+                            if(client_list.at(i).IP.compare(cur_ip) == 0){
                                 char * msg = add_two_string(second,(char*) client_list.at(i).PORT.c_str());
                                 //send
                                 struct block_info temp_block_info;
