@@ -593,7 +593,7 @@ void client_main(int argc, string ip, char *port)
                                 if(already_blocked == 0) {
                                 //cout<<"Something wromh\n";
                                     cse4589_print_and_log("[%s:SUCCESS]\n", "RECEIVED");
-                                    cse4589_print_and_log("msg from:%s\n[msg]:%s\n", sender_ip.c_str(), sender_msg.c_str());
+                                    cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_ip.c_str(), cur_ip.c_str(), sender_msg.c_str());
                                     cse4589_print_and_log("[%s:END]\n", "RECEIVED");
                                 }
                                 //cout<<"Something wromh 2\n";
