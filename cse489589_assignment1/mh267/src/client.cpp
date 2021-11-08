@@ -440,7 +440,9 @@ void client_main(int argc, string ip, char *port)
                                 struct block_info temp_block_info;
                                 temp_block_info.blocked_ip = command_vec[1];
                                 client_list[i].blocked_list.push_back(temp_block_info);
-
+                            }
+                            else if(client_list.at(i).IP.compare(command_vec[1]) == 0){
+                                char * msg = add_two_string(second,(char*) client_list.at(i).PORT.c_str());
                                 if(send(server, msg, strlen(msg), 0) == strlen(msg))
                                     success = 1;
                             }
