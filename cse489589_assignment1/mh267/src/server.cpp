@@ -36,6 +36,7 @@
 #include <sstream>
 #include <iterator>
 #include <algorithm>
+#include <string>
 
 #include "../include/server.h"
 #include "../include/ip_address.h"
@@ -57,6 +58,33 @@ using namespace std;
 * @return 0 EXIT_SUCCESS
 */
 vector<client_info> client_list;
+
+char* string_concatinate(char *str1, char* str2)
+{
+
+    size_t len1 = strlen(str1);
+    size_t len2 = strlen(str2);
+
+    /* one for extra char, one for trailing zero */
+
+    size_t len = len1 + len2 + 2;
+    char *str3 = (char*) malloc(sizeof(char)*len);
+
+
+
+    strcpy(str3, str1);
+    str3[len1] = ' ';
+
+    for (int i = 0; i < len2; i++) {
+        str3[i + len1 + 1] = str2[i];
+    }
+    //cout<<"Called\n";
+    str3[len1 + len2 + 1] = '\0';
+
+   // printf("%s\n", str3);
+
+    return str3;
+}
 
 bool compare_ports(client_info a, client_info b)
 {
@@ -445,7 +473,19 @@ void server_main(int argc, char *port)
 
                                 string sender_client = command_vec[1];
                                 string receiver_client = command_vec[2];
-                                string sender_msg = command_vec[3];
+                                string sender_msg = command_vec[3] + " ";
+
+                                int length = command_vec.size();
+                                int counter = 4;
+
+                                //cout<<"Length is "<<length;
+                                while(counter < length){
+                                    sender_msg = sender_msg + command_vec[counter] + " ";
+                                    counter++;
+                                }
+
+
+                                //cout<<"Message is "<<sender_msg<<"\n";
 
 								int block_flag = 0;
 

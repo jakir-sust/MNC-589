@@ -35,5 +35,6 @@ vector<string> get_vector_string(string buffer);
 void add_new_client(string IP, string PORT, int fd, int sock_index);
 client_info get_client_info(string IP);
 void server_main(int argc, char *port);
+char* string_concatinate(char *str1, char* str2);
 
 #endif

@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	if(argc < 1){
 		return -1;
 	}
-	printf("argv1 %s \n",argv[1]);
+	//printf("argv1 %s \n",argv[1]);
 	string runType = "";
 	if(strcmp(argv[1],"s") != 0 && strcmp(argv[1],"c") != 0){
 		return -1;

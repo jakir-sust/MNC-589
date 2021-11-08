@@ -70,6 +70,7 @@ vector<string> get_vector_stringc(char* buffer)
     while (ss >> buf)
         command_vec.push_back(buf);
 
+    cout<<"Command in client is "<<command;
     return command_vec;
 }
 
@@ -230,15 +231,24 @@ void client_main(int argc, string ip, char *port)
 					}
                     else if (command_vec[0] == "SEND") {
                         //char* added_string = add_two_string((char *)"First",(char *) "Second");
-
                         string cur_ip = get_ip();
-                        char* dest_msg = &command_vec[2][0];
+                        string dest_msg = command_vec[2] + " ";
                         char *first2 = add_two_string((char *)"SEND", (char *) cur_ip.c_str());
                         char *first3 = add_two_string(first2, (char *) &(command_vec[1][0]));
-                        char* added_string = add_two_string(first3, dest_msg);
+                        int length = command_vec.size();
+                        int counter = 3;
+                            while(counter < length){
+                                string word = command_vec[counter]; 
+                                dest_msg = dest_msg + command_vec[counter] + " ";
+                                counter++;
+                            }
 
+                        //cout<<"dest_message is "<<dest_msg<<"\n";
 
-                        // cout<<added_string<<"\n";
+                        char* added_string = add_two_string(first3, &dest_msg[0]);
+                        
+
+                        //cout<<"Message from client is "<<msg<<"\n";
                         msg = added_string;
 
                         int is_exist = 0;
@@ -250,7 +260,7 @@ void client_main(int argc, string ip, char *port)
                             }
                         }
 
-                        if(is_exist && send(server, msg, strlen(msg), 0) == strlen(msg))
+                        if(is_exist && send(server, msg, strlen(msg), 0) == strlen(msg)&&isValidIP(command_vec[1])==1)
                             cse4589_print_and_log("[%s:SUCCESS]\n", command_vec[0].c_str());
                         else
                             cse4589_print_and_log("[%s:ERROR]\n", command_vec[0].c_str());
@@ -513,23 +523,48 @@ void client_main(int argc, string ip, char *port)
                         /* Remove from watched list */
                         FD_CLR(sock_index, &master_list);
                     }
+
                     else {
                         vector<string> command_vec;
                         command_vec = get_vector_stringc(buffer);
 
                         if (command_vec[0] == "EVENT") {
-
-                            for (int i=0; i<command_vec.size()-2; i+=3) {
-                                cse4589_print_and_log("[%s:SUCCESS]\n", "RECEIVED");
-                                string sender_ip = command_vec[i+1];
-                                string sender_msg = command_vec[i+2];
-                                cse4589_print_and_log("msg from:%s\n[msg]:%s\n", sender_ip.c_str(), sender_msg.c_str());
-                                cse4589_print_and_log("[%s:END]\n", "RECEIVED");
+                            // for (int i = 0; i < command_vec.size(); i++){
+                            //     cout<<"command_vector["<<i<<"]"<<" is "<<command_vec[i]<<"\n";
+                            // }
+                            // for (int i=0; i<command_vec.size()-2; i+=1) {
+                            //     cse4589_print_and_log("[%s:SUCCESS]\n", "RECEIVED");
+                            //     string sender_ip = command_vec[i+1];
+                            //     string sender_msg = command_vec[i+2];
+                            //     int length = command_vec.size();
+                            //     int counter = 3;
+                            //     if(length > 3){
+                            //         while(counter < length){
+                            //             sender_msg = sender_msg + " " + command_vec[counter];
+                            //             counter++;
+                            //         }
+                                    
+                            //     }
+                            cse4589_print_and_log("[%s:SUCCESS]\n", "RECEIVED");
+                            string sender_ip = command_vec[1];
+                            string sender_msg = command_vec[2];
+                            int length = command_vec.size();
+                            int counter = 3;
+                            if(length > 3){
+                                while(counter < length){
+                                    sender_msg = sender_msg + " " + command_vec[counter];
+                                    counter++;
+                                }
+                                
                             }
 
+                                cse4589_print_and_log("msg from:%s\n[msg]:%s\n", sender_ip.c_str(), sender_msg.c_str());
+                                cse4589_print_and_log("[%s:END]\n", "RECEIVED");
                         }
 
                     }
+
+                
                 }
 
             }
