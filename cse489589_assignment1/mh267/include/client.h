@@ -7,7 +7,7 @@
 #define STDIN 0
 #define TRUE 1
 #define CMD_SIZE 100
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 4096
 #define MSG_SIZE 256
 using namespace std;
 

@@ -47,7 +47,7 @@ using namespace std;
 #define STDIN 0
 #define TRUE 1
 #define CMD_SIZE 100
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 4096
 
 /**
 * main function
@@ -370,7 +370,7 @@ void server_main(int argc, char *port)
                                  //if(send(sock_index, &client_list, strlen(client_list), 0) == strlen(client_list))
                                  //    printf("Done!\n");
                                  //fflush(stdout);
-								char client_data[2048];
+								char client_data[4096];
 
 								for(int i = 0 ; i < client_list.size(); i++) {
 									////cout<<"Inside For";
@@ -420,10 +420,10 @@ void server_main(int argc, char *port)
                                         send_buffer_msg_to_client += cur_buf_msg.sender_ip + " ";
                                         send_buffer_msg_to_client += cur_buf_msg.sender_msg + " ";
 
-                                        //cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
-                                        //cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", cur_buf_msg.sender_ip.c_str(),
-                                        //                        client_ip.c_str(), cur_buf_msg.sender_msg.c_str());
-                                        //cse4589_print_and_log("[%s:END]\n", "RELAYED");
+                                        cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
+                                        cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", cur_buf_msg.sender_ip.c_str(),
+                                                                client_ip.c_str(), cur_buf_msg.sender_msg.c_str());
+                                        cse4589_print_and_log("[%s:END]\n", "RELAYED");
 										client_list[i].num_msg_rcv += 1;
 
                                     }
@@ -714,7 +714,8 @@ void server_main(int argc, char *port)
                              else if (command_vec[0] == "EXIT") {
                                  // Need to be implemented
                                  client_info client = get_client_info(command_vec[1]);
-                                 if(client.login_status == "logged-in"){
+                                 //if(client.login_status == "logged-in")
+                                 {
                                     for(int i = 0 ; i < client_list.size(); i++) {
                                         if(client.IP == client_list[i].IP){
                                             client_list.erase(client_list.begin()+i);
