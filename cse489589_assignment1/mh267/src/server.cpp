@@ -1,7 +1,4 @@
 /**
-* @server
-* @author  Swetank Kumar Saha <swetankk@buffalo.edu>, Shivang Aggarwal <shivanga@buffalo.edu>
-* @version 1.0
 *
 * @section LICENSE
 *
