@@ -521,7 +521,10 @@ void server_main(int argc, char *port)
                                         string msg_client = "EVENT " + sender_client + " " + sender_msg;
                                         char * msg_to_client = (char*) msg_client.c_str();
                                         if(send(dest_client.fd, msg_to_client, strlen(msg_to_client), 0) == strlen(msg_to_client)) {
-                                            //printf("Sending to destination Done! %d %d %d\n", dest_client.fd, fdaccept, sock_index);
+
+                                            struct client_info sender_info = get_client_info(sender_client);
+                                            //printf("Sending to destination Done! %d %d %d %d %d\n", sender_info.fd, dest_client.fd, fdaccept, sock_index, head_socket);
+
                                             cse4589_print_and_log("[%s:SUCCESS]\n", "RELAYED");
                                             cse4589_print_and_log("msg from:%s, to:%s\n[msg]:%s\n", sender_client.c_str(), receiver_client.c_str(), sender_msg.c_str());
                                             cse4589_print_and_log("[%s:END]\n", "RELAYED");

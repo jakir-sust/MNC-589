@@ -55,6 +55,8 @@ using namespace std;
 * @param  argv The argument list
 * @return 0 EXIT_SUCCESS
 */
+void write_file(int sockfd);
+void send_file(string filename, int sockfd);
 
 bool compare_port(client_info a, client_info b)
 {
@@ -530,6 +532,60 @@ void client_main(int argc, string ip, char *port)
                         fflush(stdout);
                         exit(0);
                     }
+                    else if (command_vec[0] == "SENDFILE") {
+                        string cur_ip = get_ip();
+                        string dest_ip = command_vec[1];
+                        string dest_port = "None";
+                        string cur_port = "None";
+
+                        for(int i=0; i<client_list.size();i++){
+                            if(client_list[i].IP== dest_ip){
+                                dest_port = client_list[i].PORT;
+                            }
+                            if(client_list[i].IP== cur_ip){
+                                cur_port = client_list[i].PORT;
+                            }
+                        }
+                        server = connect_to_host((char *)&command_vec[1][0], (char *)&dest_port[0]);
+                        fdaccept = server;
+                        if(fdaccept < 0) perror("Accept failed.");
+
+                        /* Add to watched socket list */
+                        FD_SET(fdaccept, &master_list);
+                        if(fdaccept > head_socket) head_socket = fdaccept;
+
+                        char hostname[1024];
+                        hostname[1023] = '\0';
+                        gethostname(hostname, 1023);
+
+                        char *first2 = add_two_string((char *)"SEND_FILE", (char *) cur_ip.c_str());
+                        char* added_string = add_two_string(first2, (char*)cur_port.c_str());
+                        msg = added_string;
+                        string cur_file = command_vec[2];
+                        string filename = cur_file;
+
+                        char data[4096];
+
+                        send_file(filename, server);
+                        //fclose(fp);
+
+                    }
+                }
+                /* Check if new client is requesting connection */
+                else if(sock_index == server_socket){
+                    int caddr_len = sizeof(client_addr);
+                    fdaccept = accept(server_socket, (struct sockaddr *)&client_addr, (socklen_t*)&caddr_len);
+
+                    write_file(fdaccept);
+
+                    if(fdaccept < 0)
+                        perror("Accept failed.");
+
+                    //printf("\nRemote Host connected!\n");
+
+                    /* Add to watched socket list */
+                    FD_SET(fdaccept, &master_list);
+                    if(fdaccept > head_socket) head_socket = fdaccept;
                 }
 
                 // Other client is sending data through server
@@ -649,3 +705,84 @@ int connect_to_host(char *server_ip, char* server_port)
 	return fdsocket;
 }
 
+void write_file(int sockfd){
+    int n;
+    FILE *fp;
+    string cur_file = "recv_file.txt";
+    char *buffer = (char*) malloc(sizeof(char)*BUFFER_SIZE);
+    memset(buffer, '\0', BUFFER_SIZE);
+
+    char cwd[BUFFER_SIZE];
+    getcwd(cwd, sizeof(cwd));
+
+    while (1) {
+        //n = recv(sockfd, buffer, BUFFER_SIZE, 0);
+        if(recv(sockfd, buffer, BUFFER_SIZE, 0) < 0) break;
+
+        int p =0;
+
+        char * line = strtok(strdup(buffer), "\n");
+        while(line) {
+           vector<string> command_vec = get_vector_stringc(line);
+           if(command_vec[0] == "SENDFILE"){
+                p = 1;
+                break;
+            }
+            else if(command_vec[0] == "FILE_NAME"){
+                cur_file = command_vec[1];
+                string filename = cur_file;
+                fp = fopen((filename.c_str()), "w");
+                bzero(buffer, BUFFER_SIZE);
+                line  = strtok(NULL, "\n");
+                continue;
+            }
+            cout<<"Data received  "<<line<<"\n";
+            fprintf(fp, "%s\n", line);
+            line  = strtok(NULL, "\n");
+        }
+
+        bzero(buffer, BUFFER_SIZE);
+        if(p==1) break;
+    }
+    cout<<"Receiving file done\n";
+    fclose(fp);
+    return;
+}
+
+void send_file(string filename, int sockfd){
+    int n;
+    FILE* fp = fopen(filename.c_str(), "r");
+    //char data[BUFFER_SIZE] = {0};
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    //cout<<"OK in send file function\n";
+    char* f_name = add_two_string((char*)"FILE_NAME",(char*) filename.c_str());
+
+    if(send(sockfd, f_name, strlen(f_name), 0) == strlen(f_name)){
+            cout<<"Sending file name done    "<<f_name<<"\n";
+        }
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+
+        char* data = (char*)string(line).c_str();
+
+        if(send(sockfd, data, strlen(data), 0) == strlen(data)){
+            cout<<"Sending done    "<<data<<"\n";
+        }
+        else {
+            perror("[-]Error in sending file.");
+            exit(1);
+        }
+    }
+
+    string command = "SENDFILE";
+    char* data = (char*)command.c_str();
+    if(send(sockfd, data, strlen(data), 0) == strlen(data)){
+        cout<<"Sending done    "<<data<<"\n";
+    }
+    fclose(fp);
+
+    cout<<"Sending file done\n";
+}
