@@ -6,5 +6,6 @@
 #include <string>
 using namespace std;
 string get_ip();
-
+int isValidIP(string ipAddress);
+int isValidPort(string port);
 #endif
